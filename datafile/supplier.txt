@@ -1,0 +1,7 @@
+SupplierID:     S0647
+SupplierName:   skibidi toilet
+ContactPerson:  wo shi yi ge ren
+Phone:          0124567777
+Email:          ddddd@dfdd.ddd
+Address:        fsfwewetwtwetw
+~~~~~

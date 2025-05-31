@@ -69,7 +69,7 @@ public class SupplierMng {
             list_length = Integer.parseInt((String) Objects.requireNonNull(entries.getSelectedItem()));
             UpdatePages(AllSupplier.size());
             page_counter = 0;
-            UpdateTable(AllSupplier, list_length, page_counter);
+            UpdateTable(list_length, page_counter);
         });
         content.add(entries, gbc);
 
@@ -133,7 +133,7 @@ public class SupplierMng {
             search.setText("");
             search.requestFocus();
             UpdatePages(AllSupplier.size());
-            UpdateTable(AllSupplier, list_length, page_counter);
+            UpdateTable(list_length, page_counter);
         });
         search.addFocusListener(new FocusAdapter() {
             @Override
@@ -216,7 +216,7 @@ public class SupplierMng {
         lbl_indicate.setForeground(new Color(122, 122, 122));
 
         pages = new JComboBox<>();
-        UpdateTable(AllSupplier, list_length, page_counter);
+        UpdateTable(list_length, page_counter);
         UpdatePages(AllSupplier.size());
         table_item.setShowHorizontalLines(true);
         table_item.setShowVerticalLines(true);
@@ -262,7 +262,7 @@ public class SupplierMng {
         p_first.addActionListener(_ -> {
             page_counter = 0;
             pages.setSelectedIndex(page_counter);
-            UpdateTable(AllSupplier,list_length, page_counter);
+            UpdateTable(list_length, page_counter);
         });
         page_panel.add(p_first, ii_gbc);
 
@@ -277,7 +277,7 @@ public class SupplierMng {
             if (page_counter > 0) {
                 page_counter--;
                 pages.setSelectedIndex(page_counter);
-                UpdateTable(AllSupplier,list_length, page_counter);
+                UpdateTable(list_length, page_counter);
             }
         });
         page_panel.add(p_left, ii_gbc);
@@ -291,7 +291,7 @@ public class SupplierMng {
         pages.addActionListener(e -> {
             if (pages.getItemCount() > 0) {
                 page_counter = pages.getSelectedIndex();
-                UpdateTable(AllSupplier,list_length, page_counter);
+                UpdateTable(list_length, page_counter);
             }
         });
         page_panel.add(pages, ii_gbc);
@@ -307,7 +307,7 @@ public class SupplierMng {
             if (page_counter < pages.getItemCount() - 1) {
                 page_counter++;
                 pages.setSelectedIndex(page_counter);
-                UpdateTable(AllSupplier,list_length, page_counter);
+                UpdateTable(list_length, page_counter);
             }
         });
         page_panel.add(p_right, ii_gbc);
@@ -321,7 +321,7 @@ public class SupplierMng {
         p_last.addActionListener(_ -> {
             page_counter = pages.getItemCount() - 1;
             pages.setSelectedIndex(page_counter);
-            UpdateTable(AllSupplier,list_length, page_counter);
+            UpdateTable(list_length, page_counter);
         });
         page_panel.add(p_last, ii_gbc);
 
@@ -347,12 +347,10 @@ public class SupplierMng {
                 5, false, null, 0, 0, 0);
         btnAdd.setPreferredSize(new Dimension(185, 40));
         btnAdd.addActionListener(_ -> {
-//            AddSupplier.Loader(parent, merriweather, boldonse, content, current_user);
-//            AddSupplier.ShowPage();
-
+            AddSupplier.ShowPage();
             AllSupplier = new Supplier().ListAll();
             UpdatePages(AllSupplier.size());
-            UpdateTable(AllSupplier, list_length, page_counter);
+            UpdateTable(list_length, page_counter);
         });
         buttonPanel.add(btnAdd, buttongbc);
 
@@ -394,7 +392,7 @@ public class SupplierMng {
 
                     AllSupplier = new Supplier().ListAll();
                     UpdatePages(AllSupplier.size());
-                    UpdateTable(AllSupplier, list_length, page_counter);
+                    UpdateTable(list_length, page_counter);
 
                 } else {
                     CustomComponents.CustomOptionPane.showErrorDialog(
@@ -635,7 +633,7 @@ public class SupplierMng {
 //                        UpdatePages(list_length);
 //                        pages.setSelectedIndex(0);
 //                        UpdatePages(AllSupplier.size());
-//                        UpdateTable(AllSupplier, list_length, page_counter);
+//                        UpdateTable(list_length, page_counter);
 //
 //                        btnDelete2.setVisible(false);
 //                        btnDelete1.setVisible(true);
@@ -645,21 +643,22 @@ public class SupplierMng {
         });
         btnDelete2.setVisible(false);
         buttonPanel.add(btnDelete2, ii_gbc);
+        AddSupplier.Loader(parent, merriweather);
     }
 
-    public static void UpdateTable(List<Supplier> filteredSuppliers, int length, int page) {
+    public static void UpdateTable(int length, int page) {
         String[] titles = {"SupplierID", "SupplierName", "Contact Person", "Phone", "Email", "Address"};
         Object[][] data;
         int counter = 0;
         int anti_counter = page * length;
 
-        if (length >= filteredSuppliers.size() - anti_counter) {
-            data = new Object[filteredSuppliers.size() - anti_counter][titles.length];
+        if (length >= AllSupplier.size() - anti_counter) {
+            data = new Object[AllSupplier.size() - anti_counter][titles.length];
         } else {
             data = new Object[length][titles.length];
         }
 
-        for (Supplier supplier : filteredSuppliers) {
+        for (Supplier supplier : AllSupplier) {
             if (anti_counter != 0) {
                 anti_counter -= 1;
             } else {
@@ -673,26 +672,22 @@ public class SupplierMng {
                         supplier.getAddress()
                 };
                 counter += 1;
-                if (counter == length || counter == filteredSuppliers.size()) { break; }
+                if (counter == length || counter == AllSupplier.size()) { break; }
             }
         }
 
         table_item.UpdateTableContent(titles, data);
 
         String temp2 = "<html>Displaying <b>%s</b> to <b>%s</b> of <b>%s</b> records</html>";
-        int start = page * length + 1;
-        int end = Math.min((page + 1) * length, filteredSuppliers.size());
-        lbl_indicate.setText(String.format(temp2, start, end, filteredSuppliers.size()));
-//        if (length >= AllSupplier.size()) {
-//            lbl_indicate.setText(String.format(temp2, (!user_list.isEmpty()) ? 1 : 0, user_list.size(),
-//                    user_list.size()));
-//        } else {
-//            lbl_indicate.setText(String.format(temp2, page * length + 1,
-//                    Math.min((page + 1) * length, user_list.size()),
-//                    user_list.size()));
-//        }
+        if (length >= AllSupplier.size()) {
+            lbl_indicate.setText(String.format(temp2, (!AllSupplier.isEmpty()) ? 1 : 0, AllSupplier.size(),
+                    AllSupplier.size()));
+        } else {
+            lbl_indicate.setText(String.format(temp2, page * length + 1,
+                    Math.min((page + 1) * length, AllSupplier.size()),
+                    AllSupplier.size()));
+        }
     }
-
 
     public static void UpdatePages(int totalSuppliers) {
         int pageCount = (int) Math.ceil(totalSuppliers / (double) list_length);
@@ -711,32 +706,23 @@ public class SupplierMng {
         String searcher = (!search.getText().isEmpty() && !Objects.equals(search.getText(), "Search..."))
                 ? search.getText().trim() : "";
 
-        List<Supplier> AllSupplier = new Supplier().ListAll();
-
-        if (searcher.isEmpty()) {
-            page_counter = 0;
-            UpdatePages(AllSupplier.size());
-            UpdateTable(AllSupplier, list_length, page_counter);
-        } else {
-            AllSupplier.removeIf(supplier ->
-                    !(supplier.getSupplierID().toLowerCase().contains(searcher.toLowerCase()) ||
-                            supplier.getSupplierName().toLowerCase().contains(searcher.toLowerCase()) ||
-                            supplier.getContactPerson().toLowerCase().contains(searcher.toLowerCase()) ||
-                            supplier.getPhone().toLowerCase().contains(searcher.toLowerCase()) ||
-                            supplier.getEmail().toLowerCase().contains(searcher.toLowerCase()) ||
-                            supplier.getAddress().toLowerCase().contains(searcher.toLowerCase()))
-            );
-        }
-
-        if (AllSupplier.isEmpty()) {
+        List<Supplier> temp_supplier = new Supplier().ListAllWithFilter(searcher);
+        if (temp_supplier.isEmpty()) {
             CustomComponents.CustomOptionPane.showInfoDialog(
-                    parent, "No results found.", "Notification",
-                    Color.GRAY, Color.WHITE, Color.GRAY, Color.WHITE
+                    parent,
+                    "No results found.",
+                    "Notification",
+                    new Color(88, 149, 209),
+                    new Color(255, 255, 255),
+                    new Color(125, 178, 228),
+                    new Color(255, 255, 255)
             );
         } else {
+            AllSupplier = temp_supplier;
             page_counter = 0;
-            UpdatePages(AllSupplier.size());
-            UpdateTable(AllSupplier, list_length, page_counter);
+            UpdatePages(list_length);
+            UpdateTable(list_length, page_counter);
+            SwingUtilities.invokeLater(table_item::requestFocusInWindow);
         }
     }
 

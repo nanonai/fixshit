@@ -103,7 +103,7 @@ public class Item_Sales implements SystemEntities<Item_Sales> {
         return filter_List;
     }
 
-    // Item Sales treat type as Supplier ID
+    // Item Sales treat type as Sales ID
     @Override
     public List<Item_Sales> ListAllWithType(String type) {
         List<Item_Sales> allItemSales = ListAll();

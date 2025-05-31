@@ -305,6 +305,18 @@ public class Supplier implements SystemEntities<Supplier> {
         return !repeated;
     }
 
+    public boolean AddressChecker(String address) {
+        List<Supplier> allSupplier = ListAll();
+        boolean repeated = false;
+        for (Supplier supplier : allSupplier) {
+            if (Objects.equals(supplier.Address, address)) {
+                repeated = true;
+                break;
+            }
+        }
+        return !repeated;
+    }
+
     @Override
     public String ValidityChecker(Supplier object) {
         String indicator = "";
@@ -347,6 +359,11 @@ public class Supplier implements SystemEntities<Supplier> {
             indicator += "1";
         } else {
             indicator += "0";
+        }
+        if (AddressChecker(object.Address)) {
+            indicator += "O";
+        } else {
+            indicator += "X";
         }
         return indicator;
     }
@@ -405,6 +422,15 @@ public class Supplier implements SystemEntities<Supplier> {
             indicator += "1";
         } else {
             indicator += "0";
+        }
+        if (AddressChecker(object.Address)) {
+            indicator += "O";
+        } else {
+            if (object.Address.equals(history.Address)) {
+                indicator += "O";
+            } else {
+                indicator += "X";
+            }
         }
         return indicator;
     }
