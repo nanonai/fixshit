@@ -1,0 +1,90 @@
+UserID:         AD0000000000
+Username:       ad123
+Password:       ad123
+FullName:       Wong
+Email:          ad123@gmail.com
+Phone:          0151240129
+AccType:        Administrator
+DateOfRegis:    2025-03-31
+RememberMe:     0
+~~~~~
+UserID:         FM0000000000
+Username:       adminFMAcc
+Password:       adminFMAcc
+FullName:       Wong
+Email:          ad123@gmail.com
+Phone:          0151240129
+AccType:        Finance Manager
+DateOfRegis:    2025-03-31
+RememberMe:     0
+~~~~~
+UserID:         PM0000000000
+Username:       adminPMAcc
+Password:       adminPMAcc
+FullName:       Wong
+Email:          ad123@gmail.com
+Phone:          0151240129
+AccType:        Purchase Manager
+DateOfRegis:    2025-03-31
+RememberMe:     0
+~~~~~
+UserID:         IM0000000000
+Username:       adminIMAcc
+Password:       adminIMAcc
+FullName:       Wong
+Email:          ad123@gmail.com
+Phone:          0151240129
+AccType:        Inventory Manager
+DateOfRegis:    2025-03-31
+RememberMe:     0
+~~~~~
+UserID:         SM0000000000
+Username:       adminSMAcc
+Password:       adminSMAcc
+FullName:       Wong
+Email:          ad123@gmail.com
+Phone:          0151240129
+AccType:        Sales Manager
+DateOfRegis:    2025-03-31
+RememberMe:     0
+~~~~~
+UserID:         SM1253724128
+Username:       sm123
+Password:       sm123
+FullName:       Whei Hung
+Email:          sm123@gmail.com
+Phone:          0123354535
+AccType:        Sales Manager
+DateOfRegis:    2025-03-31
+RememberMe:     1
+~~~~~
+UserID:         PM0971204357
+Username:       pm123
+Password:       pm123
+FullName:       Boon
+Email:          pm123@gmail.com
+Phone:          0128467057
+AccType:        Purchase Manager
+DateOfRegis:    2025-03-31
+RememberMe:     0
+~~~~~
+UserID:         IM0971204357
+Username:       im123
+Password:       im123
+FullName:       Eason
+Email:          im123@gmail.com
+Phone:          0123574252
+AccType:        Inventory Manager
+DateOfRegis:    2025-03-31
+RememberMe:     0
+~~~~~
+UserID:         FM0121241241
+Username:       fm123
+Password:       fm123
+FullName:       Vanessa
+Email:          fm123@gmail.com
+Phone:          0145323423
+AccType:        Finance Manager
+DateOfRegis:    2025-03-31
+RememberMe:     0
+~~~~~
