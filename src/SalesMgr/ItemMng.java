@@ -14,9 +14,8 @@ import java.util.List;
 
 public class ItemMng {
     private static JFrame parent;
-    private static Font merriweather, boldonse;
+    private static Font merriweather;
     private static JPanel content, page_panel, buttonPanel;
-    private static User current_user;
     private static List<Item> AllItems;
     private static JButton s_btn, clear_btn, p_first, p_left, p_right, p_last;
     private static CustomComponents.CustomButton btnAdd,btnEdit, btnView, cancel_delete, btnDelete1, btnDelete2;
@@ -25,22 +24,19 @@ public class ItemMng {
     private static CustomComponents.CustomXIcon icon_clear1, icon_clear2;
     private static CustomComponents.EmptyTextField search;
     private static CustomComponents.CustomTable table_item;
-    private static CustomComponents.CustomArrowIcon right_icon1,right_icon2, left_icon1, left_icon2;
+    private static CustomComponents.CustomArrowIcon right_icon1, right_icon2, left_icon1, left_icon2;
     private static JLabel lbl_show, lbl_entries,lbl_indicate;
-    private static JComboBox entries,pages;
-    private static int list_length = 10, page_counter = 0, filter = 0, mode = 1;
+    private static JComboBox<String> entries, pages;
+    public static int list_length = 10, page_counter = 0, mode = 1;
     private static boolean deleting;
     private static Set<String> deleting_id = new LinkedHashSet<>();
     private static final Set<Integer> previousSelection = new HashSet<>();
 
 
-    public static void Loader(JFrame parent, Font merriweather, Font boldonse,
-                              JPanel content, User current_user) {
+    public static void Loader(JFrame parent, Font merriweather, JPanel content) {
         SalesMgr.ItemMng.parent = parent;
         SalesMgr.ItemMng.merriweather = merriweather;
-        SalesMgr.ItemMng.boldonse = boldonse;
         SalesMgr.ItemMng.content = content;
-        SalesMgr.ItemMng.current_user = current_user;
     }
 
     public static void ShowPage() {
@@ -397,16 +393,7 @@ public class ItemMng {
                         table_item.getSelectedRow(),
                         table_item.getColumnModel().getColumnIndex("ItemID")
                 ).toString();
-
-                System.out.println("Edit button clicked. Selected ItemID: " + selected_id);
-
-                Item selected_item = null;
-                for (Item item : AllItems) {
-                    if (item.getItemID().equals(selected_id)) {
-                        selected_item = item;
-                        break;
-                    }
-                }
+                Item selected_item = new Item().GetObjectByID(selected_id);
 
                 if (selected_item != null) {
 //                    EditNewItem.Loader(parent, merriweather, boldonse, content, current_user, selected_item);
@@ -657,7 +644,7 @@ public class ItemMng {
         });
         btnDelete2.setVisible(false);
         buttonPanel.add(btnDelete2, ii_gbc);
-        AddNewItem.Loader(parent, merriweather, boldonse, content, current_user);
+        AddNewItem.Loader(parent, merriweather);
     }
 
 

@@ -2,6 +2,7 @@ package FinanceMgr;
 
 import Admin.*;
 import Classes.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -9,25 +10,24 @@ import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
-public class InventoryPage {
+public class PaymentPage {
     private static JFrame parent;
     private static Font merriweather;
     private static JPanel content;
-    private static JComboBox<String> entries;
-    private static CustomComponents.CustomTable table_item;
-    private static List<Item> item_list;
     private static JLabel lbl_indicate;
-    private static JComboBox<String>  pages;
-    private static int list_length = 10, page_counter = 0;
+    private static JComboBox<String> entries;
+    private static CustomComponents.CustomTable table_payment;
+    private static List<Payment> payment_list;
     private static JButton p_first;
     private static JButton p_last;
+    private static int list_length = 10, page_counter = 0;
+    private static JComboBox<String>  pages;
 
     public static void Loader(JFrame parent, Font merriweather, JPanel content){
-        InventoryPage.parent = parent;
-        InventoryPage.merriweather = merriweather;
-        InventoryPage.content = content;
+        PaymentPage.parent = parent;
+        PaymentPage.merriweather = merriweather;
+        PaymentPage.content = content;
     }
-
     public  static void ShowPage(){
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -35,7 +35,18 @@ public class InventoryPage {
         gbc.weighty = 1;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.gridx = 6;
+        gbc.weightx = 14;
+        gbc.insets = new Insets(0, 0, 0, 20);
+        JLabel placeholder1 = new JLabel("");
+        content.add(placeholder1, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 10;
+        gbc.weightx = 1;
+        gbc.weighty = 18;
+        gbc.insets = new Insets(0, 20, 20, 20);
         JPanel inner = new JPanel(new GridBagLayout());
         inner.setOpaque(true);
         inner.setBackground(Color.WHITE);
@@ -61,6 +72,13 @@ public class InventoryPage {
         entries.setFont(merriweather.deriveFont(Font.BOLD, 14));
         entries.setForeground(new Color(122, 122, 122));
         entries.setFocusable(false);
+        entries.setSelectedItem("10");
+        entries.addActionListener(_ -> {
+            list_length = Integer.parseInt((String) Objects.requireNonNull(entries.getSelectedItem()));
+            UpdatePaymentPages(list_length);
+            page_counter = 0;
+            UpdatePaymentTable(list_length, page_counter);
+        });
         inner.add(entries, igbc);
 
         igbc.gridx = 2;
@@ -68,13 +86,6 @@ public class InventoryPage {
         lbl_entries.setFont(merriweather.deriveFont(Font.BOLD, 16));
         lbl_entries.setOpaque(false);
         lbl_entries.setForeground(new Color(122, 122, 122));
-        entries.setSelectedItem("10");
-        entries.addActionListener(_ -> {
-            list_length = Integer.parseInt((String) Objects.requireNonNull(entries.getSelectedItem()));
-            UpdateItemPages(list_length);
-            page_counter = 0;
-            UpdateItemTable(list_length, page_counter);
-        });
         inner.add(lbl_entries, igbc);
 
         igbc.gridx = 3;
@@ -88,28 +99,31 @@ public class InventoryPage {
         igbc.weightx = 1;
         igbc.weighty = 10;
         igbc.insets = new Insets(0, 0, 10, 0);
-        String[] titles = new String[]{"ItemID", "ItemName", "UnitPrice","UnitCost", "StockCount", "threshold","category","lastUpdateDate"};
-        item_list = new Item().ListAll();
-        Object[][] data = new Object[item_list.size()][titles.length];
+        String[] titles = new String[]{"PaymentID", "PurchaseOrderID", "Amount", "PaymentDate", "FinanceMrgID"};
+        payment_list = new Payment().ListAll();
+        Object[][] data = new Object[payment_list.size() ][titles.length];
         int counter = 0;
-        for (Item item : item_list) {
-            data[counter] = new Object[]{item.getItemID(), item.getItemName(), item.getUnitPrice(), item.getUnitCost(),
-                    item.getStockCount(), item.getThreshold(), item.getCategory(), item.getLastUpdate()};
+        for (Payment payment : payment_list) {
+            data[counter] = new Object[]{payment.getPaymentID(),
+                    payment.getPurchaseOrderID(),
+                    payment.getAmount(),
+                    payment.getPaymentDate(),
+                    payment.getFinanceMgrID()};
             counter += 1;
         }
 
-        table_item = new CustomComponents.CustomTable(titles, data, merriweather.deriveFont(Font.BOLD, 18),
+        table_payment = new CustomComponents.CustomTable(titles, data, merriweather.deriveFont(Font.BOLD, 18),
                 merriweather.deriveFont(Font.PLAIN, 16), Color.BLACK, Color.BLACK,
                 Color.WHITE, new Color(212, 212, 212), 1, 30);
         lbl_indicate = new JLabel("");
         pages = new JComboBox<>();
-        UpdateItemTable(list_length, page_counter);
-        UpdateItemPages(list_length);
-        table_item.setShowHorizontalLines(true);
-        table_item.setShowVerticalLines(true);
-        table_item.setGridColor(new Color(230, 230, 230));
+        UpdatePaymentTable(list_length, page_counter);
+        UpdatePaymentPages(list_length);
+        table_payment.setShowHorizontalLines(true);
+        table_payment.setShowVerticalLines(true);
+        table_payment.setGridColor(new Color(230, 230, 230));
 
-        CustomComponents.CustomScrollPane scrollPane1 = new CustomComponents.CustomScrollPane(false, 1, table_item,
+        CustomComponents.CustomScrollPane scrollPane1 = new CustomComponents.CustomScrollPane(false, 1, table_payment,
                 6, new Color(202, 202, 202), Main.transparent,
                 Main.transparent, Main.transparent, Main.transparent,
                 new Color(170, 170, 170), Color.WHITE,
@@ -139,7 +153,6 @@ public class InventoryPage {
         ii_gbc.gridy = 0;
         ii_gbc.weightx = 1;
         ii_gbc.weighty = 1;
-        ii_gbc.fill = GridBagConstraints.BOTH;
         ii_gbc.insets = new Insets(0, 0, 0, 0);
         p_first = new JButton("First");
         p_first.setFont(merriweather.deriveFont(Font.BOLD, 16));
@@ -148,7 +161,7 @@ public class InventoryPage {
         p_first.addActionListener(_ -> {
             page_counter = 0;
             pages.setSelectedIndex(0);
-            UpdateItemTable(list_length, page_counter);
+            UpdatePaymentTable(list_length, page_counter);
         });
         p_first.addMouseListener(new MouseAdapter() {
             @Override
@@ -190,7 +203,7 @@ public class InventoryPage {
             if (page_counter > 0) {
                 page_counter -= 1;
                 pages.setSelectedIndex(page_counter);
-                UpdateItemTable(list_length, page_counter);
+                UpdatePaymentTable(list_length, page_counter);
             }
         });
         page_panel.add(p_left, ii_gbc);
@@ -203,7 +216,7 @@ public class InventoryPage {
         pages.addActionListener(_ -> {
             if (pages.getItemCount() > 0) {
                 page_counter = pages.getSelectedIndex();
-                UpdateItemTable(list_length, page_counter);
+                UpdatePaymentTable(list_length, page_counter);
             }
         });
         page_panel.add(pages, ii_gbc);
@@ -220,7 +233,7 @@ public class InventoryPage {
             if (page_counter < pages.getItemCount() - 1) {
                 page_counter += 1;
                 pages.setSelectedIndex(page_counter);
-                UpdateItemTable(list_length, page_counter);
+                UpdatePaymentTable(list_length, page_counter);
             }
         });
         page_panel.add(p_right, ii_gbc);
@@ -233,7 +246,7 @@ public class InventoryPage {
         p_last.addActionListener(_ -> {
             page_counter = pages.getItemCount() - 1;
             pages.setSelectedIndex(page_counter);
-            UpdateItemTable(list_length, page_counter);
+            UpdatePaymentTable(list_length, page_counter);
         });
         p_last.addMouseListener(new MouseAdapter() {
             @Override
@@ -263,19 +276,19 @@ public class InventoryPage {
         });
         page_panel.add(p_last, ii_gbc);
 
-        igbc.gridwidth = 3;
+        igbc.gridwidth = 2;
         igbc.gridx = 0;
         igbc.gridy = 3;
         igbc.insets = new Insets(0, 5, 10, 0);
-        CustomComponents.CustomButton viewInventory = new CustomComponents.CustomButton("View Details", merriweather, new Color(255, 255, 255),
+        CustomComponents.CustomButton viewPayment = new CustomComponents.CustomButton("View Details", merriweather, new Color(255, 255, 255),
                 new Color(255, 255, 255), new Color(225, 108, 150), new Color(237, 136, 172),
                 Main.transparent, 0, 16, Main.transparent, false, 5, false,
                 null, 0, 0, 0);
-        viewInventory.addActionListener(_ -> {
-            if (table_item.getSelectedRowCount() == 0) {
+        viewPayment.addActionListener(_ -> {
+            if (table_payment.getSelectedRowCount() == 0) {
                 CustomComponents.CustomOptionPane.showErrorDialog(
                         parent,
-                        "Please select an item to view!",
+                        "Please select an account to view!",
                         "Error",
                         new Color(209, 88, 128),
                         new Color(255, 255, 255),
@@ -283,51 +296,49 @@ public class InventoryPage {
                         new Color(255, 255, 255)
                 );
             } else {
-                String selected_id = table_item.getValueAt(table_item.getSelectedRow(),
-                        table_item.getColumnModel().getColumnIndex("ItemID")).toString();
-                ViewInventory.UpdateInventory(new Item().GetObjectByID(selected_id));
-                ViewInventory.ShowPage();
+                String selected_id = table_payment.getValueAt(table_payment.getSelectedRow(),
+                        table_payment.getColumnModel().getColumnIndex("PaymentID")).toString();
+                ViewPayment.UpdatePayment(new Payment().GetObjectByID(selected_id));
+                ViewPayment.ShowPage();
             }
         });
-        inner.add(viewInventory, igbc);
-        ViewInventory.Loader(parent, merriweather);
+        inner.add(viewPayment, igbc);
+        ViewPayment.Loader(parent, merriweather);
     }
-
-    public static void UpdateItemTable(int length, int page) {
-        String[] titles = new String[]{"ItemID", "ItemName", "UnitPrice", "UnitCost", "StockCount", "Threshold","Category","LastUpdate"};
+    public static void UpdatePaymentTable(int length, int page) {
+        String[] titles = new String[]{"PaymentID","PurchaserOrderID", "Amount", "PaymentDate", "FinanceMrgID"};
         Object[][] data;
         int counter = 0;
         int anti_counter = page * length;
-        if (length >= item_list.size() - page * length) {
-            data = new Object[item_list.size() - page * length][titles.length];
+        if (length >= payment_list.size() - page * length) {
+            data = new Object[payment_list.size() - page * length][titles.length];
         } else {
             data = new Object[length][titles.length];
         }
-        for (Item item : item_list) {
+        for (Payment payment : payment_list) {
             if (anti_counter != 0) {
                 anti_counter -= 1;
             } else {
-                data[counter] = new Object[]{item.getItemID(), item.getItemName(),
-                        item.getUnitPrice(), item.getUnitCost(), item.getStockCount(), item.getThreshold(), item.getCategory(), item.getLastUpdate()};
+                data[counter] = new Object[]{payment.getPaymentID(), payment.getPurchaseOrderID(), payment.getAmount(), payment.getPaymentDate(), payment.getFinanceMgrID()};
                 counter += 1;
-                if (counter == length || counter == item_list.size()) { break; }
+                if (counter == length || counter == payment_list.size()) { break; }
             }
         }
-        table_item.UpdateTableContent(titles, data);
+        table_payment.UpdateTableContent(titles, data);
         String temp2 = "<html>Displaying <b>%s</b> to <b>%s</b> of <b>%s</b> records</html>";
-        if (length >= item_list.size()) {
-            lbl_indicate.setText(String.format(temp2, (!item_list.isEmpty()) ? 1 : 0, item_list.size(),
-                    item_list.size()));
+        if (length >= payment_list.size()) {
+            lbl_indicate.setText(String.format(temp2, (!payment_list.isEmpty()) ? 1 : 0, payment_list.size(),
+                    payment_list.size()));
         } else {
             lbl_indicate.setText(String.format(temp2, page * length + 1,
-                    Math.min((page + 1) * length, item_list.size()),
-                    item_list.size()));
+                    Math.min((page + 1) * length, payment_list.size()),
+                    payment_list.size()));
         }
     }
 
-    public static void UpdateItemPages(int length) {
-        int pageCount = (int) Math.ceil(item_list.size() / (double) length);
-        if (item_list.size() <= length) {
+    public static void UpdatePaymentPages(int length) {
+        int pageCount = (int) Math.ceil(payment_list.size() / (double) length);
+        if (payment_list.size() <= length) {
             pageCount = 1;
         }
         pages.removeAllItems();

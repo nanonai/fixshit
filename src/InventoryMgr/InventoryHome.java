@@ -149,11 +149,11 @@ public class InventoryHome {
 
         List<String> options = new java.util.ArrayList<>(List.of("Check Profile", "Sign Out"));
         List<ActionListener> actions = new java.util.ArrayList<>(List.of(
-                e -> {
+                _ -> {
                     InventoryHome.indicator = 1;
                     PageChanger();
                 },
-                e -> {
+                _ -> {
                     new User().UnrememberAllUser();
                     Main.indicator = 0;
                     InventoryHome.indicator = 0;
@@ -163,7 +163,7 @@ public class InventoryHome {
 
         if (current_user.getUserID().substring(2).equals("0000000000")) {
             options.add(1, "Log back to Admin Mode");
-            actions.add(1, e -> {
+            actions.add(1, _ -> {
                 User admin = new User().GetObjectByID("AD0000000000");
                 admin.setRememberMe(1);
                 AdmHome.Loader(parent, merriweather, boldonse, side_bar, top_bar, content, admin);
@@ -213,14 +213,13 @@ public class InventoryHome {
             }
         });
 
-//        Dashboard.Loader(parent, merriweather, boldonse, content, current_user);
-//        Profile.Loader(merriweather, boldonse, content, current_user);
-//        AddNewItem.Loader(parent, merriweather, boldonse, content, current_user);
+        Dashboard.Loader(parent, merriweather, boldonse, content, current_user);
+        Profile.Loader(merriweather, boldonse, content, current_user);
+        ViewItems.Loader(parent, merriweather, boldonse, content, current_user);
+        ViewPo.Loader(parent, merriweather, boldonse, content, current_user);
         PageChanger();
 
-        SwingUtilities.invokeLater(() -> {
-//            StockAlert.Popup(parent);
-        });
+        SwingUtilities.invokeLater(() -> StockAlert.Popup(parent));
     }
 
     public static void PageChanger() {
@@ -228,11 +227,6 @@ public class InventoryHome {
         content.revalidate();
         content.repaint();
         switch (indicator) {
-//    Please indicate the relation of the indicator value and specific java class: no lol
-//    0 -> Inventory Manager Welcome Page
-//    1 -> Profile page
-//    2 -> Totally NOT inventory management page.
-//    3 -> Totally NOT view po page.
             case 0:
                 Dashboard.ShowPage();
                 break;
@@ -240,17 +234,17 @@ public class InventoryHome {
                 Profile.ShowPage();
                 break;
             case 2:
-//                ItemList.ShowPage();
+                ViewItems.ShowPage();
                 break;
             case 3:
-//                POList.ShowPage();
+                ViewPo.ShowPage();
                 break;
         }
         UpdateComponentSize(parent.getWidth(), parent.getHeight());
     }
 
     public static void UpdateComponentSize(int parent_width, int parent_height) {
-        int base_size = 0;
+        int base_size;
         if (parent_width >= parent_height) {
             base_size = parent_height / 40;
         } else {
@@ -268,20 +262,6 @@ public class InventoryHome {
             profileIcon2.UpdateSize((int) (finalBase_size * 2.5));
             profile_drop.UpdateSize(top_bar.getHeight() / 2, top_bar.getHeight());
             profile.setSize(profileIcon1.getIconWidth(), profileIcon1.getIconHeight());
-            switch (indicator) {
-                case 0:
-                    Dashboard.UpdateComponentSize(finalBase_size);
-                    break;
-                case 1:
-                    Profile.UpdateComponentSize(finalBase_size);
-                    break;
-                case 2:
-//                    ItemList.UpdateComponentSize(finalBase_size);
-                    break;
-//                case 3:
-//                    POList.UpdateComponentSize(finalBase_size);
-//                    break;
-            }
         });
     }
 }

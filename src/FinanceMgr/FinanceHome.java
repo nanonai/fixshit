@@ -70,7 +70,7 @@ public class FinanceHome {
         purchaseOrder.addActionListener(_ -> {
             FinanceHome.indicator = 2;
             PageChanger();
-                });
+        });
 
         gbc_side.gridy = 2;
         gbc_side.weighty = 0.8;
@@ -236,11 +236,11 @@ public class FinanceHome {
                 UpdateComponentSize(parent.getWidth(), parent.getHeight());
             }
         });
-//        ReportPage.Loader(parent, merriweather, boldonse, content, current_user);
-//        PaymentPage.Loader(parent, merriweather, boldonse, content, current_user);
+        ReportPage.Loader(parent, merriweather, content);
+        PaymentPage.Loader(parent, merriweather, content);
         InventoryPage.Loader(parent, merriweather, content);
-//        PurchaseReqPage.Loader(parent, merriweather, boldonse, content, current_user);
-//        PurchaseOrderPage.Loader(parent, merriweather, boldonse, content, current_user);
+        PurchaseReqPage.Loader(parent, merriweather, content);
+        PurchaseOrderPage.Loader(parent, merriweather, content, current_user);
         Profile.Loader(merriweather, boldonse, content, current_user);
         PageChanger();
     }
@@ -263,22 +263,22 @@ public class FinanceHome {
                 payment.UpdateText("             Payment             ");
                 report.UpdateText("             Report             ");
                 break;
-//            case 2:
-//                PurchaseOrderPage.ShowPage();
-//                purchaseOrder.UpdateText("    Purchase Order    ");
-//                purchaseRequisition.UpdateText("    Purchase Req    ");
-//                inventory.UpdateText("    Inventory    ");
-//                payment.UpdateText("    Payment    ");
-//                report.UpdateText("    Report    ");
-//                break;
-//            case 3:
-//                PurchaseReqPage.ShowPage();
-//                purchaseOrder.UpdateText("    Purchase Order    ");
-//                purchaseRequisition.UpdateText("    Purchase Req    ");
-//                inventory.UpdateText("    Inventory    ");
-//                payment.UpdateText("    Payment    ");
-//                report.UpdateText("    Report    ");
-//                break;
+            case 2:
+                PurchaseOrderPage.ShowPage();
+                purchaseOrder.UpdateText("    Purchase Order    ");
+                purchaseRequisition.UpdateText("    Purchase Req    ");
+                inventory.UpdateText("    Inventory    ");
+                payment.UpdateText("    Payment    ");
+                report.UpdateText("    Report    ");
+                break;
+            case 3:
+                PurchaseReqPage.ShowPage();
+                purchaseOrder.UpdateText("    Purchase Order    ");
+                purchaseRequisition.UpdateText("    Purchase Req    ");
+                inventory.UpdateText("    Inventory    ");
+                payment.UpdateText("    Payment    ");
+                report.UpdateText("    Report    ");
+                break;
             case 4:
                 InventoryPage.ShowPage();
                 purchaseOrder.UpdateText("    Purchase Order    ");
@@ -287,28 +287,28 @@ public class FinanceHome {
                 payment.UpdateText("    Payment    ");
                 report.UpdateText("    Report    ");
                 break;
-//            case 5:
-//                PaymentPage.ShowPage();
-//                purchaseOrder.UpdateText("    Purchase Order    ");
-//                purchaseRequisition.UpdateText("    Purchase Req    ");
-//                inventory.UpdateText("    Inventory    ");
-//                payment.UpdateText("    Payment    ");
-//                report.UpdateText("    Report    ");
-//                break;
-//            case 6:
-//                ReportPage.ShowPage();
-//                purchaseOrder.UpdateText("    Purchase Order    ");
-//                purchaseRequisition.UpdateText("    Purchase Req    ");
-//                inventory.UpdateText("    Inventory    ");
-//                payment.UpdateText("    Payment    ");
-//                report.UpdateText("    Report    ");
-//                break;
+            case 5:
+                PaymentPage.ShowPage();
+                purchaseOrder.UpdateText("    Purchase Order    ");
+                purchaseRequisition.UpdateText("    Purchase Req    ");
+                inventory.UpdateText("    Inventory    ");
+                payment.UpdateText("    Payment    ");
+                report.UpdateText("    Report    ");
+                break;
+            case 6:
+                ReportPage.ShowPage();
+                purchaseOrder.UpdateText("    Purchase Order    ");
+                purchaseRequisition.UpdateText("    Purchase Req    ");
+                inventory.UpdateText("    Inventory    ");
+                payment.UpdateText("    Payment    ");
+                report.UpdateText("    Report    ");
+                break;
         }
         UpdateComponentSize(parent.getWidth(), parent.getHeight());
     }
 
     public static void UpdateComponentSize(int parent_width, int parent_height) {
-        int base_size = 0;
+        int base_size;
         if (parent_width >= parent_height) {
             base_size = parent_height / 40;
         } else {

@@ -4,8 +4,6 @@ import Admin.*;
 import Classes.*;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -14,9 +12,8 @@ import java.util.List;
 
 public class SupplierMng {
     private static JFrame parent;
-    private static Font merriweather, boldonse;
-    private static JPanel content, page_panel, buttonPanel;
-    private static User current_user;
+    private static Font merriweather;
+    private static JPanel content;
     private static List<Supplier> AllSupplier;
     private static JButton s_btn, clear_btn,p_first,p_left,p_right,p_last;
     private static CustomComponents.CustomButton btnAdd, btnEdit, btnView, cancel_delete, btnDelete1, btnDelete2;
@@ -27,20 +24,17 @@ public class SupplierMng {
     private static CustomComponents.CustomTable table_item;
     private static CustomComponents.CustomArrowIcon right_icon1,right_icon2, left_icon1, left_icon2;
     private static JLabel lbl_show, lbl_entries,lbl_indicate;
-    private static JComboBox entries,pages;
-    private static int list_length = 10, page_counter = 0, filter = 0, mode = 1;
+    private static JComboBox<String> entries, pages;
+    public static int list_length = 10, page_counter = 0, mode = 1;
     private static boolean deleting;
-    private static Set<String> deleting_id = new LinkedHashSet<>();
+    private static final Set<String> deleting_id = new LinkedHashSet<>();
     private static final Set<Integer> previousSelection = new HashSet<>();
 
 
-    public static void Loader(JFrame parent, Font merriweather, Font boldonse,
-                              JPanel content, User current_user) {
+    public static void Loader(JFrame parent, Font merriweather, JPanel content) {
         SalesMgr.SupplierMng.parent = parent;
         SalesMgr.SupplierMng.merriweather = merriweather;
-        SalesMgr.SupplierMng.boldonse = boldonse;
         SalesMgr.SupplierMng.content = content;
-        SalesMgr.SupplierMng.current_user = current_user;
     }
 
     public static void ShowPage() {
@@ -65,7 +59,7 @@ public class SupplierMng {
         entries.setForeground(new Color(122, 122, 122));
         entries.setFocusable(false);
         entries.setSelectedItem("10");
-        entries.addActionListener(e -> {
+        entries.addActionListener(_ -> {
             list_length = Integer.parseInt((String) Objects.requireNonNull(entries.getSelectedItem()));
             UpdatePages(AllSupplier.size());
             page_counter = 0;
@@ -129,9 +123,10 @@ public class SupplierMng {
         clear_btn.setOpaque(false);
         clear_btn.setFocusable(false);
         clear_btn.setBorder(BorderFactory.createEmptyBorder());
-        clear_btn.addActionListener(e -> {
+        clear_btn.addActionListener(_ -> {
             search.setText("");
-            search.requestFocus();
+            SearchStuff();
+            table_item.requestFocus();
             UpdatePages(AllSupplier.size());
             UpdateTable(list_length, page_counter);
         });
@@ -180,33 +175,30 @@ public class SupplierMng {
         table_item = new CustomComponents.CustomTable(titles, data, merriweather.deriveFont(Font.BOLD, 18),
                 merriweather.deriveFont(Font.PLAIN, 16), Color.BLACK, Color.BLACK,
                 Color.WHITE, new Color(212, 212, 212), 1, 30);
-        table_item.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting() && deleting) {
-                    SwingUtilities.invokeLater(() -> {
-                        int[] selectedRows = table_item.getSelectedRows();
-                        Set<Integer> currentSelection = new HashSet<>();
-                        for (int row : selectedRows) {
-                            currentSelection.add(row);
-                        }
-                        Set<Integer> newlySelected = new HashSet<>(currentSelection);
-                        newlySelected.removeAll(previousSelection);
-                        Set<Integer> deselected = new HashSet<>(previousSelection);
-                        deselected.removeAll(currentSelection);
-                        for (int row : newlySelected) {
-                            deleting_id.add(table_item.getValueAt(row,
-                                    table_item.getColumnModel().getColumnIndex("SupplierID")).toString());
-                        }
-                        for (int row : deselected) {
-                            deleting_id.remove(table_item.getValueAt(row,
-                                    table_item.getColumnModel().getColumnIndex("SupplierID")).toString());
-                        }
-                        btnDelete2.setText(String.format("Delete Supplier (%s)", deleting_id.size()));
-                        previousSelection.clear();
-                        previousSelection.addAll(currentSelection);
-                    });
-                }
+        table_item.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && deleting) {
+                SwingUtilities.invokeLater(() -> {
+                    int[] selectedRows = table_item.getSelectedRows();
+                    Set<Integer> currentSelection = new HashSet<>();
+                    for (int row : selectedRows) {
+                        currentSelection.add(row);
+                    }
+                    Set<Integer> newlySelected = new HashSet<>(currentSelection);
+                    newlySelected.removeAll(previousSelection);
+                    Set<Integer> deselected = new HashSet<>(previousSelection);
+                    deselected.removeAll(currentSelection);
+                    for (int row : newlySelected) {
+                        deleting_id.add(table_item.getValueAt(row,
+                                table_item.getColumnModel().getColumnIndex("SupplierID")).toString());
+                    }
+                    for (int row : deselected) {
+                        deleting_id.remove(table_item.getValueAt(row,
+                                table_item.getColumnModel().getColumnIndex("SupplierID")).toString());
+                    }
+                    btnDelete2.setText(String.format("Delete Supplier (%s)", deleting_id.size()));
+                    previousSelection.clear();
+                    previousSelection.addAll(currentSelection);
+                });
             }
         });
 
@@ -243,12 +235,11 @@ public class SupplierMng {
         gbc.gridwidth = 1;
         gbc.insets = new Insets(0,0,0,11);
         gbc.fill = GridBagConstraints.BOTH;
-        page_panel = new JPanel(new GridBagLayout());
+        JPanel page_panel = new JPanel(new GridBagLayout());
         page_panel.setOpaque(false);
         content.add(page_panel, gbc);
 
         GridBagConstraints ii_gbc = new GridBagConstraints();
-
         ii_gbc.gridx = 0;
         ii_gbc.gridy = 0;
         ii_gbc.fill = GridBagConstraints.BOTH;
@@ -263,6 +254,8 @@ public class SupplierMng {
             page_counter = 0;
             pages.setSelectedIndex(page_counter);
             UpdateTable(list_length, page_counter);
+            previousSelection.clear();
+            SwingUtilities.invokeLater(() -> RememberDeletion(deleting_id, table_item));
         });
         page_panel.add(p_first, ii_gbc);
 
@@ -278,6 +271,8 @@ public class SupplierMng {
                 page_counter--;
                 pages.setSelectedIndex(page_counter);
                 UpdateTable(list_length, page_counter);
+                previousSelection.clear();
+                SwingUtilities.invokeLater(() -> RememberDeletion(deleting_id, table_item));
             }
         });
         page_panel.add(p_left, ii_gbc);
@@ -288,10 +283,12 @@ public class SupplierMng {
         pages.setFocusable(false);
         pages.setBorder(BorderFactory.createLineBorder(new Color(209, 209, 209), 1));
         pages.setPreferredSize(new Dimension(150, 27));
-        pages.addActionListener(e -> {
+        pages.addActionListener(_ -> {
             if (pages.getItemCount() > 0) {
                 page_counter = pages.getSelectedIndex();
                 UpdateTable(list_length, page_counter);
+                previousSelection.clear();
+                SwingUtilities.invokeLater(() -> RememberDeletion(deleting_id, table_item));
             }
         });
         page_panel.add(pages, ii_gbc);
@@ -308,6 +305,8 @@ public class SupplierMng {
                 page_counter++;
                 pages.setSelectedIndex(page_counter);
                 UpdateTable(list_length, page_counter);
+                previousSelection.clear();
+                SwingUtilities.invokeLater(() -> RememberDeletion(deleting_id, table_item));
             }
         });
         page_panel.add(p_right, ii_gbc);
@@ -322,6 +321,8 @@ public class SupplierMng {
             page_counter = pages.getItemCount() - 1;
             pages.setSelectedIndex(page_counter);
             UpdateTable(list_length, page_counter);
+            previousSelection.clear();
+            SwingUtilities.invokeLater(() -> RememberDeletion(deleting_id, table_item));
         });
         page_panel.add(p_last, ii_gbc);
 
@@ -332,15 +333,14 @@ public class SupplierMng {
         gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(0,0,0,70);
-        buttonPanel = new JPanel(new GridBagLayout());
+        JPanel buttonPanel = new JPanel(new GridBagLayout());
         buttonPanel.setOpaque(false);
         content.add(buttonPanel, gbc);
 
-        GridBagConstraints buttongbc = new GridBagConstraints();
-        buttongbc.gridx = 0;
-        buttongbc.weightx = 1;
-        buttongbc.fill = GridBagConstraints.BOTH;
-        buttongbc.insets = new Insets(3, 7, 5, 20);
+        gbc.gridx = 0;
+        gbc.weightx = 1;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(3, 7, 5, 20);
         btnAdd = new CustomComponents.CustomButton("Add Supplier", merriweather, Color.WHITE, Color.WHITE,
                 new Color(225, 108, 150), new Color(237, 136, 172),
                 Main.transparent, 0, 20, Main.transparent, false,
@@ -352,9 +352,9 @@ public class SupplierMng {
             UpdatePages(AllSupplier.size());
             UpdateTable(list_length, page_counter);
         });
-        buttonPanel.add(btnAdd, buttongbc);
+        buttonPanel.add(btnAdd, gbc);
 
-        buttongbc.gridx = 1;
+        gbc.gridx = 1;
         btnEdit = new CustomComponents.CustomButton("Edit Supplier", merriweather, Color.WHITE, Color.WHITE,
                 new Color(225, 108, 150), new Color(237, 136, 172),
                 Main.transparent, 0, 20, Main.transparent, false,
@@ -378,17 +378,10 @@ public class SupplierMng {
                         table_item.getColumnModel().getColumnIndex("SupplierID")
                 ).toString();
 
-                Supplier selected_supplier = null;
-                for (Supplier supplier : AllSupplier) {
-                    if (supplier.getSupplierID().equals(selected_id)) {
-                        selected_supplier = supplier;
-                        break;
-                    }
-                }
-
+                Supplier selected_supplier = new Supplier().GetObjectByID(selected_id);
                 if (selected_supplier != null) {
-//                    EditSupplier.Loader(parent, merriweather, boldonse, content, current_user, selected_supplier);
-//                    EditSupplier.ShowPage();
+                    EditSupplier.UpdateSupplier(selected_supplier);
+                    EditSupplier.ShowPage();
 
                     AllSupplier = new Supplier().ListAll();
                     UpdatePages(AllSupplier.size());
@@ -407,10 +400,10 @@ public class SupplierMng {
                 }
             }
         });
-        buttonPanel.add(btnEdit, buttongbc);
+        buttonPanel.add(btnEdit, gbc);
 
 
-        buttongbc.gridx = 2;
+        gbc.gridx = 2;
         btnView = new CustomComponents.CustomButton("View Supplier", merriweather, Color.WHITE, Color.WHITE,
                 new Color(225, 108, 150), new Color(237, 136, 172),
                 Main.transparent, 0, 20, Main.transparent, false,
@@ -433,20 +426,10 @@ public class SupplierMng {
                         table_item.getColumnModel().getColumnIndex("SupplierID")
                 ).toString();
 
-                Supplier selected_supplier = null;
-                for (Supplier supplier : AllSupplier) {
-                    if (supplier.getSupplierID().equals(selected_id)) {
-                        selected_supplier = supplier;
-                        break;
-                    }
-                }
-
+                Supplier selected_supplier = new Supplier().GetObjectByID(selected_id);
                 if (selected_supplier != null) {
-//                    ViewSupplier.Loader(parent, merriweather, boldonse, content, selected_supplier);
-//                    boolean see = ViewSupplier.ShowPage();
-//                    if (see) {
-//                        System.out.println("Supplier viewed.");
-//                    }
+                    ViewSupplier.UpdateSupplier(selected_supplier);
+                    ViewSupplier.ShowPage();
                 } else {
                     CustomComponents.CustomOptionPane.showErrorDialog(
                             parent,
@@ -460,7 +443,7 @@ public class SupplierMng {
                 }
             }
         });
-        buttonPanel.add(btnView, buttongbc);
+        buttonPanel.add(btnView, gbc);
 
         cancel_delete = new CustomComponents.CustomButton("Cancel", merriweather, Color.WHITE, Color.WHITE,
                 new Color(56, 53, 70), new Color(73, 69, 87), null, 0, 16,
@@ -498,10 +481,10 @@ public class SupplierMng {
             btnDelete1.setVisible(true);
         });
         cancel_delete.setVisible(false);
-        buttonPanel.add(cancel_delete, buttongbc);
+        buttonPanel.add(cancel_delete, gbc);
 
 
-        buttongbc.gridx = 3;
+        gbc.gridx = 3;
         btnDelete1 = new CustomComponents.CustomButton("Delete Supplier", merriweather, Color.WHITE, Color.WHITE,
                 new Color(50, 8, 32), new Color(174, 122, 140),
                 Main.transparent, 0, 20, Main.transparent, false,
@@ -549,7 +532,7 @@ public class SupplierMng {
                 btnDelete2.setVisible(true);
             }
         });
-        buttonPanel.add(btnDelete1, buttongbc);
+        buttonPanel.add(btnDelete1, gbc);
 
         btnDelete2 = new CustomComponents.CustomButton("Delete Supplier (0)", merriweather, Color.WHITE, Color.WHITE,
                 new Color(159, 4, 4), new Color(161, 40, 40), null, 0, 16,
@@ -570,25 +553,16 @@ public class SupplierMng {
             } else {
 
                 List<String> ids = new ArrayList<>(deleting_id);
-
-                List<Supplier> suppliersToDelete = new ArrayList<>();
-                for (String supplierId : ids) {
-                    Supplier supplier = new Supplier().GetObjectByID(supplierId);
-                    if (supplier != null) {
-                        suppliersToDelete.add(supplier);
-                    }
-                }
+                List<Supplier> suppliersToDelete = new Supplier().GetObjectsByIDS(ids);
                 List<Item_Supplier> d_supplierItems = new ArrayList<>();
                 for (Supplier spl : suppliersToDelete) {
                     List<Item_Supplier> temp = new Item_Supplier().ListAllWithType(spl.getSupplierID());
                     d_supplierItems.addAll(temp);
                 }
-//
-//                DeleteSupplier.UpdateItemSupplier(d_supplierItems);
                 if (!d_supplierItems.isEmpty()) {
                     CustomComponents.CustomOptionPane.showErrorDialog(
                             parent,
-                            "<html>This supplier is registered to some items,<br>" +
+                            "<html>Supplier(s) selected is registered to some items,<br>" +
                                     "please resolve before removing!</html>",
                             "Error",
                             new Color(209, 88, 128),
@@ -597,54 +571,69 @@ public class SupplierMng {
                             new Color(255, 255, 255)
                     );
                 } else {
-//                    boolean delete = DeleteSupplier.ShowPage();
-//                    if (delete) {
-//                        deleting = false;
-//                        for (Supplier supplier : suppliersToDelete) {
-//                            new Supplier().Remove(supplier);
-//                        }
-//                        AllSupplier = new Supplier().ListAll();
-//                        deleting_id.clear();
-//                        btnView.setEnabled(true);
-//                        btnAdd.setEnabled(true);
-//                        btnEdit.setEnabled(true);
-//                        btnView.setVisible(true);
-//                        cancel_delete.setVisible(false);
-//
-//                        btnView.UpdateColor(new Color(255, 255, 255), new Color(255, 255, 255),
-//                                new Color(225, 108, 150), new Color(237, 136, 172),
-//                                Main.transparent);
-//                        btnAdd.UpdateColor(new Color(255, 255, 255), new Color(255, 255, 255),
-//                                new Color(209, 88, 128), new Color(237, 136, 172),
-//                                Main.transparent);
-//                        btnEdit.UpdateColor(new Color(255, 255, 255), new Color(255, 255, 255),
-//                                new Color(225, 108, 150), new Color(237, 136, 172),
-//                                Main.transparent);
-//
-//                        table_item.SetColors(Color.BLACK, Color.BLACK, Color.WHITE, new Color(212, 212, 212));
-//                        mode = 1;
-//                        table_item.SetChanges(merriweather.deriveFont(Font.BOLD, 18),
-//                                merriweather.deriveFont(Font.PLAIN, 16), mode);
-//
-//                        scrollPane1.UpdateBorder(1, new Color(202, 202, 202), Main.transparent,
-//                                Main.transparent, Main.transparent, Main.transparent);
-//                        filter = 0;
-//                        page_counter = 0;
-//                        UpdatePages(list_length);
-//                        pages.setSelectedIndex(0);
-//                        UpdatePages(AllSupplier.size());
-//                        UpdateTable(list_length, page_counter);
-//
-//                        btnDelete2.setVisible(false);
-//                        btnDelete1.setVisible(true);
-//                    }
+                    DeleteSupplier.UpdateSupplier(suppliersToDelete);
+                    boolean delete = DeleteSupplier.ShowPage();
+                    if (delete) {
+                        deleting = false;
+                        AllSupplier = new Supplier().ListAll();
+                        deleting_id.clear();
+                        btnView.setEnabled(true);
+                        btnAdd.setEnabled(true);
+                        btnEdit.setEnabled(true);
+                        btnView.setVisible(true);
+                        cancel_delete.setVisible(false);
+
+                        btnView.UpdateColor(new Color(255, 255, 255), new Color(255, 255, 255),
+                                new Color(225, 108, 150), new Color(237, 136, 172),
+                                Main.transparent);
+                        btnAdd.UpdateColor(new Color(255, 255, 255), new Color(255, 255, 255),
+                                new Color(209, 88, 128), new Color(237, 136, 172),
+                                Main.transparent);
+                        btnEdit.UpdateColor(new Color(255, 255, 255), new Color(255, 255, 255),
+                                new Color(225, 108, 150), new Color(237, 136, 172),
+                                Main.transparent);
+
+                        table_item.SetColors(Color.BLACK, Color.BLACK, Color.WHITE, new Color(212, 212, 212));
+                        mode = 1;
+                        table_item.SetChanges(merriweather.deriveFont(Font.BOLD, 18),
+                                merriweather.deriveFont(Font.PLAIN, 16), mode);
+
+                        scrollPane1.UpdateBorder(1, new Color(202, 202, 202), Main.transparent,
+                                Main.transparent, Main.transparent, Main.transparent);
+                        page_counter = 0;
+                        UpdatePages(list_length);
+                        pages.setSelectedIndex(0);
+                        UpdatePages(AllSupplier.size());
+                        UpdateTable(list_length, page_counter);
+
+                        btnDelete2.setVisible(false);
+                        btnDelete1.setVisible(true);
+                    }
                 }
             }
         });
         btnDelete2.setVisible(false);
-        buttonPanel.add(btnDelete2, ii_gbc);
+        buttonPanel.add(btnDelete2, gbc);
         AddSupplier.Loader(parent, merriweather);
+        EditSupplier.Loader(parent, merriweather);
+        ViewSupplier.Loader(parent, merriweather);
+        DeleteSupplier.Loader(parent, merriweather);
     }
+
+    public static void RememberDeletion(Set<String> deleting_id, CustomComponents.CustomTable table) {
+        if (deleting) {
+            int rowCount = table.getRowCount();
+            for (int i = 0; i < rowCount; i++) {
+                Object value = table.getValueAt(i, table.getColumnModel().getColumnIndex("SupplierID"));
+                if (value != null && deleting_id.contains(value.toString())) {
+                    table.addRowSelectionInterval(i, i);
+                }
+            }
+            table.revalidate();
+            table.repaint();
+        }
+    }
+
 
     public static void UpdateTable(int length, int page) {
         String[] titles = {"SupplierID", "SupplierName", "Contact Person", "Phone", "Email", "Address"};

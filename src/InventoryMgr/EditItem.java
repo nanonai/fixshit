@@ -1,36 +1,40 @@
-package SalesMgr;
+package InventoryMgr;
 
 import Admin.*;
 import Classes.*;
+import SalesMgr.AddNewItem;
 
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
+import java.awt.font.TextAttribute;
+import java.util.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
-import java.util.*;
-import java.awt.Font;
-import java.awt.Color;
-import java.awt.font.TextAttribute;
 import java.util.List;
 
-public class AddNewItem {
+
+public class EditItem {
     private static JFrame parent;
     private static Font merriweather;
-    private static Item future;
+    private static Item selected_item;
     private static JComboBox<String> types;
-    private static CustomComponents.EmptyTextField itemName, unitPrice, unitCost, stockCount, threshold, supplierName;
+    private static CustomComponents.EmptyTextField itemName, unitPrice, unitCost, stockCount, threshold;
 
     public static void Loader(JFrame parent, Font merriweather) {
-        AddNewItem.parent = parent;
-        AddNewItem.merriweather = merriweather;
+        EditItem.parent = parent;
+        EditItem.merriweather = merriweather;
+    }
+
+    public static void UpdateItem(Item selected_item) {
+        EditItem.selected_item = selected_item;
     }
 
     public static void ShowPage() {
-        JDialog dialog = new JDialog(parent, "Add New Item", true);
+        JDialog dialog = new JDialog(parent, "Edit Item Details", true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setSize(parent.getWidth() / 2, parent.getHeight() / 2);
         dialog.setResizable(false);
@@ -55,7 +59,7 @@ public class AddNewItem {
         gbc.gridwidth = 2;
         gbc.insets = new Insets(10, 10, 10, 0);
         gbc.fill = GridBagConstraints.BOTH;
-        JLabel title = new JLabel("Add New Item");
+        JLabel title = new JLabel("Edit Item Details");
         title.setOpaque(false);
         title.setFont(merriweather.deriveFont(Font.BOLD, (float) (base_size * 1.3)));
         panel.add(title, gbc);
@@ -99,12 +103,6 @@ public class AddNewItem {
         panel.add(min_label, gbc);
 
         gbc.gridy = 7;
-        JLabel supplier_label = new JLabel("Supplier Name:");
-        supplier_label.setOpaque(false);
-        supplier_label.setFont(merriweather.deriveFont(Font.PLAIN, (float) (base_size)));
-        panel.add(supplier_label, gbc);
-
-        gbc.gridy = 8;
         gbc.insets = new Insets(0, 10, 10, 0);
         CustomComponents.CustomButton cancel = new CustomComponents.CustomButton("Cancel",
                 merriweather.deriveFont(Font.PLAIN), Color.WHITE, Color.WHITE,
@@ -150,6 +148,7 @@ public class AddNewItem {
         types.setBorder(BorderFactory.createLineBorder(new Color(209, 209, 209), 1));
         types.addActionListener(_ -> SwingUtilities.invokeLater(itemName::requestFocusInWindow));
         setAlphaSpaceOnlyFilter(types);
+        SwingUtilities.invokeLater(() -> types.setSelectedItem(selected_item.getCategory()));
         panel.add(types, gbc);
 
         gbc.gridy = 2;
@@ -187,13 +186,6 @@ public class AddNewItem {
         inner5.setBorder(BorderFactory.createLineBorder(new Color(209, 209, 209), 1));
         panel.add(inner5, gbc);
 
-        gbc.gridy = 7;
-        JPanel inner6 = new JPanel(new GridBagLayout());
-        inner6.setOpaque(true);
-        inner6.setBackground(Color.WHITE);
-        inner6.setBorder(BorderFactory.createLineBorder(new Color(209, 209, 209), 1));
-        panel.add(inner6, gbc);
-
         GridBagConstraints igbc = new GridBagConstraints();
         igbc.fill = GridBagConstraints.BOTH;
         igbc.gridx = 0;
@@ -227,6 +219,7 @@ public class AddNewItem {
             }
         });
         ((AbstractDocument) itemName.getDocument()).setDocumentFilter(new AlphaNumericFilter());
+        itemName.setText(selected_item.getItemName());
         inner1.add(itemName, igbc);
 
         unitPrice = new CustomComponents.EmptyTextField(20, "",
@@ -266,6 +259,7 @@ public class AddNewItem {
             }
         });
         ((AbstractDocument) unitPrice.getDocument()).setDocumentFilter(new DigitLimitDotFilter(10));
+        unitPrice.setText(Double.toString(selected_item.getUnitPrice()));
         inner2.add(unitPrice, igbc);
 
         unitCost = new CustomComponents.EmptyTextField(20, "",
@@ -305,6 +299,7 @@ public class AddNewItem {
             }
         });
         ((AbstractDocument) unitCost.getDocument()).setDocumentFilter(new DigitLimitDotFilter(10));
+        unitCost.setText(Double.toString(selected_item.getUnitCost()));
         inner3.add(unitCost, igbc);
 
         stockCount = new CustomComponents.EmptyTextField(20, "",
@@ -344,11 +339,12 @@ public class AddNewItem {
             }
         });
         ((AbstractDocument) stockCount.getDocument()).setDocumentFilter(new DigitLimitFilter(20));
+        stockCount.setText(Integer.toString(selected_item.getStockCount()));
         inner4.add(stockCount, igbc);
 
         threshold = new CustomComponents.EmptyTextField(20, "", Color.BLACK);
         threshold.setFont(merriweather.deriveFont(Font.PLAIN, (float) (base_size * 0.8)));
-        threshold.addActionListener(_ -> SwingUtilities.invokeLater(supplierName::requestFocusInWindow));
+        threshold.addActionListener(_ -> confirm.doClick());
         threshold.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -382,52 +378,8 @@ public class AddNewItem {
             }
         });
         ((AbstractDocument) threshold.getDocument()).setDocumentFilter(new DigitLimitFilter(20));
+        threshold.setText(Integer.toString(selected_item.getThreshold()));
         inner5.add(threshold, igbc);
-
-
-        supplierName = new CustomComponents.EmptyTextField(20, "",
-                Color.BLACK);
-        supplierName.setFont(merriweather.deriveFont(Font.PLAIN, (float) (base_size * 0.8)));
-        supplierName.addActionListener(_ -> SwingUtilities.invokeLater(confirm::doClick));
-        supplierName.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                supplierName.setForeground(Color.BLACK);
-                supplierName.setFont(merriweather.deriveFont(Font.PLAIN, (float) (base_size * 0.8)));
-                supplierName.setToolTipText("Enter supplier name.");
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                supplierName.setToolTipText("");
-                String input = supplierName.getText().trim();
-
-                if (input.isEmpty()) {
-                    supplierName.setForeground(new Color(159, 4, 4));
-                    Font font = supplierName.getFont();
-                    Map<TextAttribute, Object> attributes = new HashMap<>(font.getAttributes());
-                    attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-                    supplierName.setFont(font.deriveFont(attributes));
-                    supplierName.setToolTipText("Supplier name cannot be empty.");
-                } else {
-                    Supplier supplierID= new Supplier().GetObjectByName(input);
-                    if (supplierID == null) {
-                        supplierName.setForeground(new Color(159, 4, 4));
-                        Font font = supplierName.getFont();
-                        Map<TextAttribute, Object> attributes = new HashMap<>(font.getAttributes());
-                        attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-                        supplierName.setFont(font.deriveFont(attributes));
-                        supplierName.setToolTipText("Supplier name not found or does not exist!");
-                    } else {
-                        supplierName.setForeground(Color.BLACK);
-                        supplierName.setFont(supplierName.getFont().deriveFont(Font.PLAIN));
-                        supplierName.setToolTipText("");
-                    }
-                }
-            }
-        });
-        ((AbstractDocument) supplierName.getDocument()).setDocumentFilter(new AlphaNumericFilter());
-        inner6.add(supplierName, igbc);
 
         CustomComponents.CustomXIcon icon_clear1 = new CustomComponents.CustomXIcon((int) (base_size * 0.8), 3,
                 new Color(209, 209, 209), true);
@@ -476,20 +428,11 @@ public class AddNewItem {
         clear5.addActionListener(_ -> threshold.Reset());
         inner5.add(clear5, igbc);
 
-        JButton clear6 = new JButton(icon_clear1);
-        clear6.setRolloverIcon(icon_clear2);
-        clear6.setOpaque(false);
-        clear6.setFocusable(false);
-        clear6.setBorder(BorderFactory.createEmptyBorder());
-        clear6.addActionListener(_ -> supplierName.Reset());
-        inner6.add(clear6, igbc);
-
         cancel.addActionListener(_ -> dialog.dispose());
 
         confirm.addActionListener(_ -> {
             if (itemName.getText().isEmpty() || unitPrice.getText().isEmpty() || unitCost.getText().isEmpty() ||
-                    stockCount.getText().isEmpty() || threshold.getText().isEmpty() || supplierName.getText().isEmpty()) {
-
+                    stockCount.getText().isEmpty() || threshold.getText().isEmpty()) {
                 CustomComponents.CustomOptionPane.showErrorDialog(
                         parent,
                         "Fields cannot be left empty or just contain spaces!",
@@ -502,8 +445,8 @@ public class AddNewItem {
             } else {
                 Item checking = new Item("", itemName.getText().strip(), Double.parseDouble(unitPrice.getText().trim()),
                         Double.parseDouble(unitCost.getText().trim()), Integer.parseInt(stockCount.getText().trim()),
-                        Integer.parseInt(threshold.getText().trim()), Objects.requireNonNull(types.getSelectedItem()).toString().strip(), null);
-                String validity = new Item().ValidityChecker(checking);
+                        Integer.parseInt(threshold.getText().trim()), Objects.requireNonNull(types.getSelectedItem()).toString().trim(), null);
+                String validity = new Item().ValidityCheckerWithHistory(checking, selected_item);
                 if (validity.charAt(0) == '0') {
                     CustomComponents.CustomOptionPane.showErrorDialog(
                             parent,
@@ -585,71 +528,37 @@ public class AddNewItem {
                             new Color(255, 255, 255)
                     );
                 } else {
-                    Supplier spl = new Supplier().GetObjectByName(supplierName.getText().strip());
-                    if (spl == null) {
-                        CustomComponents.CustomOptionPane.showErrorDialog(
+                    String item_name = itemName.getText().strip();
+                    double unitPriceValue = Double.parseDouble(unitPrice.getText().trim());
+                    double unitCostValue = Double.parseDouble(unitCost.getText().trim());
+                    int stockCountValue = Integer.parseInt(stockCount.getText().trim());
+                    int thresholdValue = Integer.parseInt(threshold.getText().trim());
+                    String item_type = Objects.requireNonNull(types.getSelectedItem()).toString().strip();
+                    if (!item_name.equals(selected_item.getItemName()) ||
+                            unitPriceValue != selected_item.getUnitPrice() ||
+                            unitCostValue != selected_item.getUnitCost() ||
+                            stockCountValue != selected_item.getStockCount() ||
+                            thresholdValue != selected_item.getThreshold() ||
+                            !item_type.equals(selected_item.getCategory())) {
+                        selected_item.setItemName(itemName.getText().strip());
+                        selected_item.setCategory(item_type);
+                        selected_item.setUnitPrice(unitPriceValue);
+                        selected_item.setUnitCost(unitCostValue);
+                        selected_item.setStockCount(stockCountValue);
+                        selected_item.setThreshold(thresholdValue);
+                        selected_item.setLastUpdate(LocalDate.now());
+                        new Item().Modify(selected_item.getItemID(), selected_item);
+                        CustomComponents.CustomOptionPane.showInfoDialog(
                                 parent,
-                                "Supplier not found! PLease add supplier!",
-                                "Error",
-                                new Color(209, 88, 128),
+                                "Item modified successfully.",
+                                "Notification",
+                                new Color(88, 149, 209),
                                 new Color(255, 255, 255),
-                                new Color(237, 136, 172),
+                                new Color(125, 178, 228),
                                 new Color(255, 255, 255)
                         );
-                    } else {
-                        double unitPriceValue = Double.parseDouble(unitPrice.getText().trim());
-                        double unitCostValue = Double.parseDouble(unitCost.getText().trim());
-                        int stockCountValue = Integer.parseInt(stockCount.getText().trim());
-                        int thresholdValue = Integer.parseInt(threshold.getText().trim());
-
-                        String item_type = (String) Objects.requireNonNull(types.getSelectedItem());
-                        String new_id = new Item().IdMaker();
-                        LocalDate currentDate = LocalDate.now();
-                        future = new Item(new_id, itemName.getText(), unitPriceValue, unitCostValue,
-                                stockCountValue, thresholdValue, item_type, currentDate);
-                        new Item().AddNew(future);
-
-                        Item_Supplier itemSupplier = new Item_Supplier(future.getItemID(), spl.getSupplierID());
-                        new Item_Supplier().AddNew(itemSupplier);
-
-                        boolean keep_adding = CustomComponents.CustomOptionPane.showConfirmDialog(
-                                parent,
-                                "Keep adding new items?",
-                                "Confirmation",
-                                new Color(209, 88, 128),
-                                new Color(255, 255, 255),
-                                new Color(237, 136, 172),
-                                new Color(255, 255, 255),
-                                new Color(56, 53, 70),
-                                new Color(255, 255, 255),
-                                new Color(73, 69, 87),
-                                new Color(255, 255, 255),
-                                true
-                        );
-
-                        if (!keep_adding) {
-                            dialog.dispose();
-                        } else {
-                            itemName.Reset();
-                            unitPrice.Reset();
-                            unitCost.Reset();
-                            List<Item> its = new Item().ListAll();
-                            List<String> cs = new ArrayList<>();
-                            for (Item i : its) {
-                                if (!cs.contains(i.getCategory())) {
-                                    cs.add(i.getCategory());
-                                }
-                            }
-                            types.removeAllItems();
-                            for (String c : cs) {
-                                types.addItem(c);
-                            }
-                            types.setSelectedIndex(0);
-                            stockCount.Reset();
-                            threshold.Reset();
-                            supplierName.Reset();
-                        }
                     }
+                    dialog.dispose();
                 }
             }
         });

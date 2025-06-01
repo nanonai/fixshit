@@ -1,7 +1,7 @@
 package FinanceMgr;
 
-import Admin.*;
 import Classes.*;
+import Admin.Main;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -9,13 +9,13 @@ import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
-public class InventoryPage {
+public class PurchaseReqPage {
     private static JFrame parent;
     private static Font merriweather;
     private static JPanel content;
     private static JComboBox<String> entries;
-    private static CustomComponents.CustomTable table_item;
-    private static List<Item> item_list;
+    private static CustomComponents.CustomTable table_purReq;
+    private static List<PurchaseRequisition> purchaseReq_list;
     private static JLabel lbl_indicate;
     private static JComboBox<String>  pages;
     private static int list_length = 10, page_counter = 0;
@@ -23,11 +23,11 @@ public class InventoryPage {
     private static JButton p_last;
 
     public static void Loader(JFrame parent, Font merriweather, JPanel content){
-        InventoryPage.parent = parent;
-        InventoryPage.merriweather = merriweather;
-        InventoryPage.content = content;
-    }
+        PurchaseReqPage.parent = parent;
+        PurchaseReqPage.merriweather = merriweather;
+        PurchaseReqPage.content = content;
 
+    }
     public  static void ShowPage(){
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -35,7 +35,18 @@ public class InventoryPage {
         gbc.weighty = 1;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.gridx = 6;
+        gbc.weightx = 14;
+        gbc.insets = new Insets(0, 0, 0, 20);
+        JLabel placeholder1 = new JLabel("");
+        content.add(placeholder1, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 10;
+        gbc.weightx = 1;
+        gbc.weighty = 18;
+        gbc.insets = new Insets(0, 20, 20, 20);
         JPanel inner = new JPanel(new GridBagLayout());
         inner.setOpaque(true);
         inner.setBackground(Color.WHITE);
@@ -48,6 +59,7 @@ public class InventoryPage {
         igbc.weighty = 1;
         igbc.fill = GridBagConstraints.BOTH;
         igbc.insets = new Insets(10, 10, 10, 10);
+
         JLabel lbl_show = new JLabel("Show");
         lbl_show.setFont(merriweather.deriveFont(Font.BOLD, 16));
         lbl_show.setOpaque(false);
@@ -61,6 +73,13 @@ public class InventoryPage {
         entries.setFont(merriweather.deriveFont(Font.BOLD, 14));
         entries.setForeground(new Color(122, 122, 122));
         entries.setFocusable(false);
+        entries.setSelectedItem("10");
+        entries.addActionListener(_ -> {
+            list_length = Integer.parseInt((String) Objects.requireNonNull(entries.getSelectedItem()));
+            UpdatePRPages(list_length);
+            page_counter = 0;
+            UpdatePRTable(list_length, page_counter);
+        });
         inner.add(entries, igbc);
 
         igbc.gridx = 2;
@@ -68,13 +87,6 @@ public class InventoryPage {
         lbl_entries.setFont(merriweather.deriveFont(Font.BOLD, 16));
         lbl_entries.setOpaque(false);
         lbl_entries.setForeground(new Color(122, 122, 122));
-        entries.setSelectedItem("10");
-        entries.addActionListener(_ -> {
-            list_length = Integer.parseInt((String) Objects.requireNonNull(entries.getSelectedItem()));
-            UpdateItemPages(list_length);
-            page_counter = 0;
-            UpdateItemTable(list_length, page_counter);
-        });
         inner.add(lbl_entries, igbc);
 
         igbc.gridx = 3;
@@ -82,34 +94,41 @@ public class InventoryPage {
         JLabel placeholder2 = new JLabel("");
         inner.add(placeholder2, igbc);
 
+        igbc.gridx = 4;
+        igbc.weightx = 10;
+        JLabel placeholder3 = new JLabel("");
+        inner.add(placeholder3, igbc);
+
         igbc.gridwidth = 5;
         igbc.gridx = 0;
         igbc.gridy = 1;
         igbc.weightx = 1;
         igbc.weighty = 10;
         igbc.insets = new Insets(0, 0, 10, 0);
-        String[] titles = new String[]{"ItemID", "ItemName", "UnitPrice","UnitCost", "StockCount", "threshold","category","lastUpdateDate"};
-        item_list = new Item().ListAll();
-        Object[][] data = new Object[item_list.size()][titles.length];
+        String[] titles = new String[]{"PurchaseReqID", "ItemID", "SupplierID", "Quantity", "ReqDate", "SalesMgrID", "Status"};
+        purchaseReq_list = new PurchaseRequisition().ListAll();
+        Object[][] data = new Object[purchaseReq_list.size()][titles.length];
         int counter = 0;
-        for (Item item : item_list) {
-            data[counter] = new Object[]{item.getItemID(), item.getItemName(), item.getUnitPrice(), item.getUnitCost(),
-                    item.getStockCount(), item.getThreshold(), item.getCategory(), item.getLastUpdate()};
+        for (PurchaseRequisition purchaseRequisition : purchaseReq_list) {
+            data[counter] = new Object[]{purchaseRequisition.getPurchaseReqID(), purchaseRequisition.getItemID(), purchaseRequisition.getSupplierID(),
+                    purchaseRequisition.getQuantity(), purchaseRequisition.getReqDate(), purchaseRequisition.getSalesMgrID(),
+                    (purchaseRequisition.getStatus() == 0) ? "Pending" : "Processed"};
             counter += 1;
         }
 
-        table_item = new CustomComponents.CustomTable(titles, data, merriweather.deriveFont(Font.BOLD, 18),
+        table_purReq = new CustomComponents.CustomTable(titles, data, merriweather.deriveFont(Font.BOLD, 18),
                 merriweather.deriveFont(Font.PLAIN, 16), Color.BLACK, Color.BLACK,
                 Color.WHITE, new Color(212, 212, 212), 1, 30);
+
         lbl_indicate = new JLabel("");
         pages = new JComboBox<>();
-        UpdateItemTable(list_length, page_counter);
-        UpdateItemPages(list_length);
-        table_item.setShowHorizontalLines(true);
-        table_item.setShowVerticalLines(true);
-        table_item.setGridColor(new Color(230, 230, 230));
+        UpdatePRTable(list_length, page_counter);
+        UpdatePRPages(list_length);
+        table_purReq.setShowHorizontalLines(true);
+        table_purReq.setShowVerticalLines(true);
+        table_purReq.setGridColor(new Color(230, 230, 230));
 
-        CustomComponents.CustomScrollPane scrollPane1 = new CustomComponents.CustomScrollPane(false, 1, table_item,
+        CustomComponents.CustomScrollPane scrollPane1 = new CustomComponents.CustomScrollPane(false, 1, table_purReq,
                 6, new Color(202, 202, 202), Main.transparent,
                 Main.transparent, Main.transparent, Main.transparent,
                 new Color(170, 170, 170), Color.WHITE,
@@ -140,7 +159,6 @@ public class InventoryPage {
         ii_gbc.weightx = 1;
         ii_gbc.weighty = 1;
         ii_gbc.fill = GridBagConstraints.BOTH;
-        ii_gbc.insets = new Insets(0, 0, 0, 0);
         p_first = new JButton("First");
         p_first.setFont(merriweather.deriveFont(Font.BOLD, 16));
         p_first.setBorder(BorderFactory.createLineBorder(new Color(209, 209, 209), 1));
@@ -148,7 +166,7 @@ public class InventoryPage {
         p_first.addActionListener(_ -> {
             page_counter = 0;
             pages.setSelectedIndex(0);
-            UpdateItemTable(list_length, page_counter);
+            UpdatePRTable(list_length, page_counter);
         });
         p_first.addMouseListener(new MouseAdapter() {
             @Override
@@ -190,7 +208,7 @@ public class InventoryPage {
             if (page_counter > 0) {
                 page_counter -= 1;
                 pages.setSelectedIndex(page_counter);
-                UpdateItemTable(list_length, page_counter);
+                UpdatePRTable(list_length, page_counter);
             }
         });
         page_panel.add(p_left, ii_gbc);
@@ -203,7 +221,7 @@ public class InventoryPage {
         pages.addActionListener(_ -> {
             if (pages.getItemCount() > 0) {
                 page_counter = pages.getSelectedIndex();
-                UpdateItemTable(list_length, page_counter);
+                UpdatePRTable(list_length, page_counter);
             }
         });
         page_panel.add(pages, ii_gbc);
@@ -220,7 +238,7 @@ public class InventoryPage {
             if (page_counter < pages.getItemCount() - 1) {
                 page_counter += 1;
                 pages.setSelectedIndex(page_counter);
-                UpdateItemTable(list_length, page_counter);
+                UpdatePRTable(list_length, page_counter);
             }
         });
         page_panel.add(p_right, ii_gbc);
@@ -233,7 +251,7 @@ public class InventoryPage {
         p_last.addActionListener(_ -> {
             page_counter = pages.getItemCount() - 1;
             pages.setSelectedIndex(page_counter);
-            UpdateItemTable(list_length, page_counter);
+            UpdatePRTable(list_length, page_counter);
         });
         p_last.addMouseListener(new MouseAdapter() {
             @Override
@@ -266,16 +284,19 @@ public class InventoryPage {
         igbc.gridwidth = 3;
         igbc.gridx = 0;
         igbc.gridy = 3;
-        igbc.insets = new Insets(0, 5, 10, 0);
-        CustomComponents.CustomButton viewInventory = new CustomComponents.CustomButton("View Details", merriweather, new Color(255, 255, 255),
-                new Color(255, 255, 255), new Color(225, 108, 150), new Color(237, 136, 172),
+        igbc.insets = new Insets(0, 0, 0, 0);
+        CustomComponents.CustomButton viewPurchaseReq = new CustomComponents.CustomButton("View Details", merriweather,
+                new Color(255, 255, 255),
+                new Color(255, 255, 255),
+                new Color(225, 108, 150),
+                new Color(237, 136, 172),
                 Main.transparent, 0, 16, Main.transparent, false, 5, false,
                 null, 0, 0, 0);
-        viewInventory.addActionListener(_ -> {
-            if (table_item.getSelectedRowCount() == 0) {
+        viewPurchaseReq.addActionListener(_ -> {
+            if (table_purReq.getSelectedRowCount() == 0) {
                 CustomComponents.CustomOptionPane.showErrorDialog(
                         parent,
-                        "Please select an item to view!",
+                        "Please select a Purchase Requisition to view!",
                         "Error",
                         new Color(209, 88, 128),
                         new Color(255, 255, 255),
@@ -283,51 +304,51 @@ public class InventoryPage {
                         new Color(255, 255, 255)
                 );
             } else {
-                String selected_id = table_item.getValueAt(table_item.getSelectedRow(),
-                        table_item.getColumnModel().getColumnIndex("ItemID")).toString();
-                ViewInventory.UpdateInventory(new Item().GetObjectByID(selected_id));
-                ViewInventory.ShowPage();
+                String selected_id = table_purReq.getValueAt(table_purReq.getSelectedRow(),
+                        table_purReq.getColumnModel().getColumnIndex("PurchaseReqID")).toString();
+                ViewPurchaseReq.UpdatePurchaseReq(new PurchaseRequisition().GetObjectByID(selected_id));
+                ViewPurchaseReq.ShowPage();
             }
         });
-        inner.add(viewInventory, igbc);
-        ViewInventory.Loader(parent, merriweather);
+        inner.add(viewPurchaseReq, igbc);
+        ViewPurchaseReq.Loader(parent, merriweather);
     }
-
-    public static void UpdateItemTable(int length, int page) {
-        String[] titles = new String[]{"ItemID", "ItemName", "UnitPrice", "UnitCost", "StockCount", "Threshold","Category","LastUpdate"};
+    public static void UpdatePRTable(int length, int page) {
+        String[] titles = new String[]{"PurchaseReqID", "ItemID", "SupplierID", "Quantity", "ReqDate", "SalesMrgID", "Status"};
         Object[][] data;
         int counter = 0;
         int anti_counter = page * length;
-        if (length >= item_list.size() - page * length) {
-            data = new Object[item_list.size() - page * length][titles.length];
+        if (length >= purchaseReq_list.size() - page * length) {
+            data = new Object[purchaseReq_list.size() - page * length][titles.length];
         } else {
             data = new Object[length][titles.length];
         }
-        for (Item item : item_list) {
+        for (PurchaseRequisition purchaseRequisition : purchaseReq_list) {
             if (anti_counter != 0) {
                 anti_counter -= 1;
             } else {
-                data[counter] = new Object[]{item.getItemID(), item.getItemName(),
-                        item.getUnitPrice(), item.getUnitCost(), item.getStockCount(), item.getThreshold(), item.getCategory(), item.getLastUpdate()};
+                data[counter] = new Object[]{purchaseRequisition.getPurchaseReqID(), purchaseRequisition.getItemID(), purchaseRequisition.getSupplierID(),
+                        purchaseRequisition.getQuantity(), purchaseRequisition.getReqDate(), purchaseRequisition.getSalesMgrID(),
+                        (purchaseRequisition.getStatus() == 0) ? "Pending" : "Processed"};
                 counter += 1;
-                if (counter == length || counter == item_list.size()) { break; }
+                if (counter == length || counter == purchaseReq_list.size()) { break; }
             }
         }
-        table_item.UpdateTableContent(titles, data);
+        table_purReq.UpdateTableContent(titles, data);
         String temp2 = "<html>Displaying <b>%s</b> to <b>%s</b> of <b>%s</b> records</html>";
-        if (length >= item_list.size()) {
-            lbl_indicate.setText(String.format(temp2, (!item_list.isEmpty()) ? 1 : 0, item_list.size(),
-                    item_list.size()));
+        if (length >= purchaseReq_list.size()) {
+            lbl_indicate.setText(String.format(temp2, (!purchaseReq_list.isEmpty()) ? 1 : 0, purchaseReq_list.size(),
+                    purchaseReq_list.size()));
         } else {
             lbl_indicate.setText(String.format(temp2, page * length + 1,
-                    Math.min((page + 1) * length, item_list.size()),
-                    item_list.size()));
+                    Math.min((page + 1) * length, purchaseReq_list.size()),
+                    purchaseReq_list.size()));
         }
     }
 
-    public static void UpdateItemPages(int length) {
-        int pageCount = (int) Math.ceil(item_list.size() / (double) length);
-        if (item_list.size() <= length) {
+    public static void UpdatePRPages(int length) {
+        int pageCount = (int) Math.ceil(purchaseReq_list.size() / (double) length);
+        if (purchaseReq_list.size() <= length) {
             pageCount = 1;
         }
         pages.removeAllItems();

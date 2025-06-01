@@ -2,6 +2,7 @@ package SalesMgr;
 
 import Admin.*;
 import Classes.CustomComponents;
+import Classes.Supplier;
 import Classes.User;
 import InventoryMgr.InventoryHome;
 
@@ -246,9 +247,9 @@ public class SalesHome {
         });
 
         Profile.Loader(merriweather, boldonse, content, current_user);
-        ItemMng.Loader(parent, merriweather, boldonse, content, current_user);
+        ItemMng.Loader(parent, merriweather, content);
 //        SalesDashboard.Loader(parent, merriweather, boldonse, content, current_user);
-        SupplierMng.Loader(parent, merriweather, boldonse, content, current_user);
+        SupplierMng.Loader(parent, merriweather, content);
 //        DailySalesMng.Loader(parent, merriweather, boldonse, content, current_user);
 //        PurchaseRequisitionMng.Loader(parent, merriweather, boldonse, content, current_user);
 //        PurchaseOrderMng.Loader(parent, merriweather, boldonse, content, current_user);
@@ -262,8 +263,13 @@ public class SalesHome {
         content.removeAll();
         content.revalidate();
         content.repaint();
+        ItemMng.list_length = 10;
+        ItemMng.page_counter = 0;
+        ItemMng.mode = 1;
+        SupplierMng.list_length = 10;
+        SupplierMng.page_counter = 0;
+        SupplierMng.mode = 1;
         switch (indicator) {
-
             case 0:
 //                SalesDashboard.ShowPage();
                 title.setText(String.format("<html>Welcome, Sales Manager <i>- %s</i></html>",
@@ -298,7 +304,7 @@ public class SalesHome {
     }
 
     public static void UpdateComponentSize(int parent_width, int parent_height) {
-        int base_size = 0;
+        int base_size;
         if (parent_width >= parent_height) {
             base_size = parent_height / 40;
         } else {

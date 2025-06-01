@@ -1,0 +1,63 @@
+ItemID:         I3247
+ItemName:       Ah Boon Banana
+UnitPrice:      8.99
+UnitCost:       6.0
+StockCount:     0
+Threshold:      10
+Category:       Fruits
+LastUpdate:     2025-06-01
+~~~~~
+ItemID:         I9402
+ItemName:       Brime
+UnitPrice:      1000.0
+UnitCost:       1.0
+StockCount:     10
+Threshold:      0
+Category:       Energy Drink
+LastUpdate:     2025-06-01
+~~~~~
+ItemID:         I6502
+ItemName:       Apple
+UnitPrice:      12.0
+UnitCost:       6.0
+StockCount:     0
+Threshold:      0
+Category:       Fruits
+LastUpdate:     2025-06-01
+~~~~~
+ItemID:         I8448
+ItemName:       Durian
+UnitPrice:      222.0
+UnitCost:       111.0
+StockCount:     0
+Threshold:      0
+Category:       Fruits
+LastUpdate:     2025-06-01
+~~~~~
+ItemID:         I9109
+ItemName:       Banana Onigiri
+UnitPrice:      12.0
+UnitCost:       1.0
+StockCount:     0
+Threshold:      0
+Category:       Snacks
+LastUpdate:     2025-06-01
+~~~~~
+ItemID:         I7951
+ItemName:       Tempura Don
+UnitPrice:      15.0
+UnitCost:       1.0
+StockCount:     0
+Threshold:      0
+Category:       Meal Box
+LastUpdate:     2025-06-01
+~~~~~
+ItemID:         I0895
+ItemName:       Teriyaki Chicken With Rice
+UnitPrice:      15.0
+UnitCost:       10.0
+StockCount:     11
+Threshold:      0
+Category:       Meal Box
+LastUpdate:     2025-06-01
+~~~~~

@@ -552,62 +552,73 @@ public class Dashboard {
                     sortedLabels.getFirst()
             );
 
-            cat2 = new CustomComponents.CustomDataSeriesIcon(
-                    20, colors2[1],
-                    Color.WHITE, merriweather.deriveFont(Font.PLAIN, 12),
-                    sortedLabels.get(1)
-            );
-
-            cat3 = new CustomComponents.CustomDataSeriesIcon(
-                    20, colors2[2],
-                    Color.WHITE, merriweather.deriveFont(Font.PLAIN, 12),
-                    sortedLabels.get(2)
-            );
-
-            cat4 = new CustomComponents.CustomDataSeriesIcon(
-                    20, colors2[3],
-                    Color.WHITE, merriweather.deriveFont(Font.PLAIN, 12),
-                    sortedLabels.get(3)
-            );
-
-            cat5 = new CustomComponents.CustomDataSeriesIcon(
-                    20, colors2[4],
-                    Color.WHITE, merriweather.deriveFont(Font.PLAIN, 12),
-                    sortedLabels.get(4)
-            );
-
-            other = new CustomComponents.CustomDataSeriesIcon(
-                    20, colors2[5],
-                    Color.WHITE, merriweather.deriveFont(Font.PLAIN, 12),
-                    "All of the others"
-            );
-
             igbc.gridx = 0;
             igbc.gridy = 0;
             igbc.weighty = 1;
             c_lab1 = new JLabel(cat1);
             data_panel.add(c_lab1, igbc);
 
-            igbc.gridy = 1;
-            c_lab3 = new JLabel(cat3);
-            data_panel.add(c_lab3, igbc);
+            if (sortedLabels.size() > 1) {
+                cat2 = new CustomComponents.CustomDataSeriesIcon(
+                        20, colors2[1],
+                        Color.WHITE, merriweather.deriveFont(Font.PLAIN, 12),
+                        sortedLabels.get(1)
+                );
 
-            igbc.gridy = 2;
-            c_lab5 = new JLabel(cat5);
-            data_panel.add(c_lab5, igbc);
+                igbc.gridx = 1;
+                c_lab2 = new JLabel(cat2);
+                data_panel.add(c_lab2, igbc);
 
-            igbc.gridx = 1;
-            igbc.gridy = 0;
-            c_lab2 = new JLabel(cat2);
-            data_panel.add(c_lab2, igbc);
+                if (sortedLabels.size() > 2) {
+                    cat3 = new CustomComponents.CustomDataSeriesIcon(
+                            20, colors2[2],
+                            Color.WHITE, merriweather.deriveFont(Font.PLAIN, 12),
+                            sortedLabels.get(2)
+                    );
 
-            igbc.gridy = 1;
-            c_lab4 = new JLabel(cat4);
-            data_panel.add(c_lab4, igbc);
+                    igbc.gridx = 0;
+                    igbc.gridy = 1;
+                    c_lab3 = new JLabel(cat3);
+                    data_panel.add(c_lab3, igbc);
 
-            igbc.gridy = 2;
-            other_lab = new JLabel(other);
-            data_panel.add(other_lab, igbc);
+                    if (sortedLabels.size() > 3) {
+                        cat4 = new CustomComponents.CustomDataSeriesIcon(
+                                20, colors2[3],
+                                Color.WHITE, merriweather.deriveFont(Font.PLAIN, 12),
+                                sortedLabels.get(3)
+                        );
+
+                        igbc.gridx = 1;
+                        c_lab4 = new JLabel(cat4);
+                        data_panel.add(c_lab4, igbc);
+
+                        if (sortedLabels.size() > 4) {
+                            cat5 = new CustomComponents.CustomDataSeriesIcon(
+                                    20, colors2[4],
+                                    Color.WHITE, merriweather.deriveFont(Font.PLAIN, 12),
+                                    sortedLabels.get(4)
+                            );
+
+                            igbc.gridx = 0;
+                            igbc.gridy = 2;
+                            c_lab5 = new JLabel(cat5);
+                            data_panel.add(c_lab5, igbc);
+
+                            if (sortedLabels.size() > 1) {
+                                other = new CustomComponents.CustomDataSeriesIcon(
+                                        20, colors2[5],
+                                        Color.WHITE, merriweather.deriveFont(Font.PLAIN, 12),
+                                        "All of the others"
+                                );
+
+                                igbc.gridx = 1;
+                                other_lab = new JLabel(other);
+                                data_panel.add(other_lab, igbc);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -659,18 +670,40 @@ public class Dashboard {
         payment_label.setIcon(payment_icon);
         series_panel.repaint();
         button_panel.repaint();
-        if (!sortedLabels.isEmpty()) {
+        if (cat1 != null) {
             cat1.UpdateSize(base_size);
+        }
+        if (c_lab1 != null) {
             c_lab1.setIcon(cat1);
+        }
+        if (cat2 != null) {
             cat2.UpdateSize(base_size);
+        }
+        if (c_lab2 != null) {
             c_lab2.setIcon(cat2);
+        }
+        if (cat3 != null) {
             cat3.UpdateSize(base_size);
+        }
+        if (c_lab3 != null) {
             c_lab3.setIcon(cat3);
+        }
+        if (cat4 != null) {
             cat4.UpdateSize(base_size);
+        }
+        if (c_lab4 != null) {
             c_lab4.setIcon(cat4);
+        }
+        if (cat5 != null) {
             cat5.UpdateSize(base_size);
+        }
+        if (c_lab5 != null) {
             c_lab5.setIcon(cat5);
+        }
+        if (other != null) {
             other.UpdateSize(base_size);
+        }
+        if (other_lab != null) {
             other_lab.setIcon(other);
         }
         finTitle.setFont(merriweather.deriveFont(Font.BOLD, (float) (base_size * 1.5)));

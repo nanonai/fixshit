@@ -1,7 +1,70 @@
 SupplierID:     S0647
-SupplierName:   skibidi toilet
-ContactPerson:  wo shi yi ge ren
-Phone:          0124567777
-Email:          ddddd@dfdd.ddd
-Address:        fsfwewetwtwetw
+SupplierName:   Ah Boon Fresh Fruits
+ContactPerson:  Mr Ah Boon
+Phone:          0123456789
+Email:          boonfreshfruits@gmail.com
+Address:        88, Jalan Ah Boon, Taman Ah Boon
+~~~~~
+SupplierID:     S8390
+SupplierName:   Eason Japanese Cuisine
+ContactPerson:  Eason Chan
+Phone:          0124567898
+Email:          easonjpcuisine@gmail.com
+Address:        yappa yappa dappa dappa
+~~~~~
+SupplierID:     S4613
+SupplierName:   Wong Supplement For Weebs
+ContactPerson:  Hello I am Ah Wong
+Phone:          0111111111
+Email:          hellothisisahwong@gmail.com
+Address:        weeb live and work at his house always (I'm not telling you where)
+~~~~~
+SupplierID:     S5085
+SupplierName:   Fancy Drinks
+ContactPerson:  Logan Paul
+Phone:          0123433545
+Email:          nowayyouactuallythinkImarealperson@gmail.com
+Address:        lol no way he's gonna write this down
+~~~~~
+SupplierID:     S0963
+SupplierName:   Mr Tan Selling His Own Stuff
+ContactPerson:  Mr Tan That Have No Money
+Phone:          0135265421
+Email:          mrtan@gmail.com
+Address:        mr tan is selling his own shite to make money for his waifus
+~~~~~
+SupplierID:     S9385
+SupplierName:   Guys We Need To Make Money
+ContactPerson:  Chat Chad
+Phone:          0123456732
+Email:          skibididoilot@gmail.com
+Address:        chat are we cooked?
+~~~~~
+SupplierID:     S9036
+SupplierName:   Wolf Of Wall Street
+ContactPerson:  Barry Elen
+Phone:          0124463653
+Email:          iamnotascammer@gmail.com
+Address:        which part u don't understand in "Wall Street"?
+~~~~~
+SupplierID:     S0550
+SupplierName:   222222222222222222222222
+ContactPerson:  qqqqqqqqqqqqqqqqqqqqqqqqqqq
+Phone:          0122222222
+Email:          e2eeeee2@d.dee
+Address:        eeeeeeeeeeeeeeeee
+~~~~~
+SupplierID:     S9998
+SupplierName:   qqqqqqqqqq
+ContactPerson:  qqqqqqqqq
+Phone:          0124565434
+Email:          edsgde@fesgwege.afw
+Address:        123124241241412
+~~~~~
+SupplierID:     S2745
+SupplierName:   dsfdsfdsfsdf
+ContactPerson:  dsfsdfsdfdsf
+Phone:          0123124124
+Email:          dsfdsfdfwef!@sdfds.sdfdsf
+Address:        sdfdsfdfsdfsdf
 ~~~~~

@@ -4,7 +4,10 @@ import Admin.*;
 import Classes.*;
 
 import javax.swing.*;
-import javax.swing.text.*;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -15,19 +18,23 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-public class AddSupplier {
+public class EditSupplier {
     private static JFrame parent;
     private static Font merriweather;
-    private static Supplier newSupplier;
     private static CustomComponents.EmptyTextField supplierName, contactPerson, phone, email, address;
+    private static Supplier selected_supplier;
 
     public static void Loader(JFrame parent, Font merriweather) {
-        AddSupplier.parent = parent;
-        AddSupplier.merriweather = merriweather;
+        EditSupplier.parent = parent;
+        EditSupplier.merriweather = merriweather;
+    }
+
+    public static void UpdateSupplier(Supplier supplier) {
+        selected_supplier = supplier;
     }
 
     public static void ShowPage() {
-        JDialog dialog = new JDialog(parent, "Add New Supplier", true);
+        JDialog dialog = new JDialog(parent, "Edit Supplier", true);
         dialog.setSize(parent.getWidth() / 2, parent.getHeight() / 2);
         dialog.setLocationRelativeTo(parent);
         dialog.setResizable(false);
@@ -53,7 +60,7 @@ public class AddSupplier {
         gbc.gridwidth = 2;
         gbc.insets = new Insets(10, 10, 10, 0);
         gbc.fill = GridBagConstraints.BOTH;
-        JLabel title = new JLabel("Add New Supplier");
+        JLabel title = new JLabel("Edit Supplier");
         title.setOpaque(false);
         title.setFont(merriweather.deriveFont(Font.BOLD, (float) (base_size * 1.3)));
         panel.add(title, gbc);
@@ -185,7 +192,7 @@ public class AddSupplier {
                     attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
                     supplierName.setFont(font.deriveFont(attributes));
                     supplierName.setToolTipText("Supplier name length must be between 8 and 48 characters.");
-                } else if (!new Supplier().NameChecker(input)) {
+                } else if (!new Supplier().NameChecker(input) && !input.equals(selected_supplier.getSupplierName())) {
                     supplierName.setForeground(new Color(159, 4, 4));
                     Font font = supplierName.getFont();
                     Map<TextAttribute, Object> attributes = new java.util.HashMap<>(font.getAttributes());
@@ -195,6 +202,7 @@ public class AddSupplier {
                 }
             }
         });
+        supplierName.setText(selected_supplier.getSupplierName());
         inner1.add(supplierName, igbc);
 
         contactPerson = new CustomComponents.EmptyTextField(20, "",
@@ -223,6 +231,7 @@ public class AddSupplier {
                 }
             }
         });
+        contactPerson.setText(selected_supplier.getContactPerson());
         inner2.add(contactPerson, igbc);
 
         igbc.weightx = 1;
@@ -257,7 +266,8 @@ public class AddSupplier {
                 phone.setFont(merriweather.deriveFont(Font.PLAIN, (float) (base_size * 0.8)));
                 phone.setToolTipText("");
                 String input = phone.getText();
-                if (!new Supplier().PhoneChecker("0" + input) && !input.isEmpty()) {
+                if (!new Supplier().PhoneChecker("0" + input) && !input.isEmpty() &&
+                        !("0" + input).equals(selected_supplier.getPhone())) {
                     phone.setForeground(new Color(159, 4, 4));
                     Font font = phone.getFont();
                     Map<TextAttribute, Object> attributes = new java.util.HashMap<>(font.getAttributes());
@@ -274,8 +284,9 @@ public class AddSupplier {
                 }
             }
         });
-        ((AbstractDocument) phone.getDocument()).setDocumentFilter(new AddSupplier.DigitLimitFilter(9));
+        ((AbstractDocument) phone.getDocument()).setDocumentFilter(new DigitLimitFilter(9));
         phone.setFont(merriweather.deriveFont(Font.PLAIN, (float) (base_size * 0.8)));
+        phone.setText(selected_supplier.getPhone().substring(1));
         inner3.add(phone, igbc);
 
         email = new CustomComponents.EmptyTextField(20, "",
@@ -294,7 +305,8 @@ public class AddSupplier {
             public void focusLost(FocusEvent e) {
                 email.setToolTipText("");
                 String input = email.getText();
-                if (!new Supplier().EmailChecker(input) && !input.isEmpty()) {
+                if (!new Supplier().EmailChecker(input) && !input.isEmpty() &&
+                        !input.equals(selected_supplier.getEmail())) {
                     email.setForeground(new Color(159, 4, 4));
                     Font font = email.getFont();
                     Map<TextAttribute, Object> attributes = new java.util.HashMap<>(font.getAttributes());
@@ -312,6 +324,7 @@ public class AddSupplier {
             }
         });
         ((AbstractDocument) email.getDocument()).setDocumentFilter(new NoSpaceFilter());
+        email.setText(selected_supplier.getEmail());
         inner4.add(email, igbc);
 
         address = new CustomComponents.EmptyTextField(20, "",
@@ -340,6 +353,7 @@ public class AddSupplier {
                 }
             }
         });
+        address.setText(selected_supplier.getAddress());
         inner5.add(address, igbc);
 
         CustomComponents.CustomXIcon icon_clear1 = new CustomComponents.CustomXIcon((int) (base_size * 0.8), 3,
@@ -408,7 +422,7 @@ public class AddSupplier {
             }else {
                 Supplier checking = new Supplier("", supplierName.getText().strip(), contactPerson.getText().strip(),
                         "0"+phone.getText(), email.getText().strip(), address.getText().strip());
-                String validity = new Supplier().ValidityChecker(checking);
+                String validity = new Supplier().ValidityCheckerWithHistory(checking, selected_supplier);
                 if (validity.charAt(0) == '0') {
                     CustomComponents.CustomOptionPane.showErrorDialog(
                             parent,
@@ -500,38 +514,30 @@ public class AddSupplier {
                             new Color(255, 255, 255)
                     );
                 } else {
-                    String new_ID = new Supplier().IdMaker();
                     String supplierNameText = supplierName.getText().trim();
                     String contactPersonText = contactPerson.getText().trim();
-                    String phoneText = phone.getText().trim();
+                    String phoneText = "0" + phone.getText().trim();
                     String emailText = email.getText().trim();
                     String addressText = address.getText().trim();
-                    newSupplier = new Supplier(new_ID, supplierNameText, contactPersonText, "0" +phoneText,
-                            emailText, addressText);
-                    new Supplier().AddNew(newSupplier);
-                    boolean keep_adding = CustomComponents.CustomOptionPane.showConfirmDialog(
-                            parent,
-                            "Supplier added successfully. Add another one?",
-                            "Confirmation",
-                            new Color(209, 88, 128),
-                            new Color(255, 255, 255),
-                            new Color(237, 136, 172),
-                            new Color(255, 255, 255),
-                            new Color(56, 53, 70),
-                            new Color(255, 255, 255),
-                            new Color(73, 69, 87),
-                            new Color(255, 255, 255),
-                            true
-                    );
-                    if (!keep_adding) {
-                        dialog.dispose();
-                    } else {
-                        supplierName.Reset();
-                        contactPerson.Reset();
-                        phone.Reset();
-                        email.Reset();
-                        address.Reset();
+                    Supplier supplier = new Supplier(selected_supplier.getSupplierID(), supplierNameText,
+                            contactPersonText, phoneText, emailText, addressText);
+                    if (!supplierNameText.equals(selected_supplier.getSupplierName()) ||
+                            !contactPersonText.equals(selected_supplier.getContactPerson()) ||
+                            !phoneText.equals(selected_supplier.getPhone()) ||
+                            !emailText.equals(selected_supplier.getEmail()) ||
+                            !addressText.equals(selected_supplier.getAddress())) {
+                        new Supplier().Modify(selected_supplier.getSupplierID(), supplier);
+                        CustomComponents.CustomOptionPane.showInfoDialog(
+                                parent,
+                                "Supplier modified successfully.",
+                                "Notification",
+                                new Color(88, 149, 209),
+                                new Color(255, 255, 255),
+                                new Color(125, 178, 228),
+                                new Color(255, 255, 255)
+                        );
                     }
+                    dialog.dispose();
                 }
             }
         });
@@ -594,6 +600,52 @@ public class AddSupplier {
         public void remove(FilterBypass fb, int offset, int length)
                 throws BadLocationException {
             super.remove(fb, offset, length);
+        }
+    }
+
+    static class AlphaNumericFilter extends DocumentFilter {
+        private static final int MAX_LENGTH = 255;
+        private static final String ALPHA_NUMERIC_REGEX = "[a-zA-Z0-9 ]+";
+
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+            if (string != null && string.matches(ALPHA_NUMERIC_REGEX)) {
+                int currentLength = fb.getDocument().getLength();
+                if ((currentLength + string.length()) <= MAX_LENGTH) {
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+            if (text == null || text.isEmpty() || text.matches(ALPHA_NUMERIC_REGEX)) {
+                int currentLength = fb.getDocument().getLength();
+                int newLength = currentLength - length + (text != null ? text.length() : 0);
+                if (newLength <= MAX_LENGTH) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+        }
+    }
+
+    static class AlphaSpaceFilter extends DocumentFilter {
+        private static final String REGEX = "[a-zA-Z ]+";
+
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+                throws BadLocationException {
+            if (string != null && string.matches(REGEX)) {
+                super.insertString(fb, offset, string, attr);
+            }
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+                throws BadLocationException {
+            if (text != null && text.matches(REGEX)) {
+                super.replace(fb, offset, length, text, attrs);
+            }
         }
     }
 

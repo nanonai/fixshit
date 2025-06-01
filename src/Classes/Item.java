@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class Item implements SystemEntities<Item> {
-    private String ItemID, ItemName, Category;
+    private String ItemID;
+    private String ItemName;
+    private String Category;
     private double UnitPrice, UnitCost;
     private int StockCount, Threshold;
     private LocalDate LastUpdate;
@@ -307,7 +309,7 @@ public class Item implements SystemEntities<Item> {
     @Override
     public String ValidityChecker(Item object) {
         String indicator = "";
-        if (object.ItemName.length() >= 8 && object.ItemName.length() <= 48) {
+        if (object.ItemName.length() >= 3 && object.ItemName.length() <= 48) {
             indicator += "1";
         } else {
             indicator += "0";
@@ -342,7 +344,7 @@ public class Item implements SystemEntities<Item> {
         } else {
             indicator += "0";
         }
-        if (object.Category.length() >= 8 && object.Category.length() <= 48) {
+        if (object.Category.length() >= 3 && object.Category.length() <= 48) {
             indicator += "1";
         } else {
             indicator += "0";
@@ -353,7 +355,7 @@ public class Item implements SystemEntities<Item> {
     @Override
     public String ValidityCheckerWithHistory(Item object, Item history) {
         String indicator = "";
-        if (object.ItemName.length() >= 8 && object.ItemName.length() <= 48) {
+        if (object.ItemName.length() >= 3 && object.ItemName.length() <= 48) {
             indicator += "1";
         } else {
             indicator += "0";
@@ -377,6 +379,11 @@ public class Item implements SystemEntities<Item> {
         } else {
             indicator += "0";
         }
+        if (object.UnitCost < object.UnitPrice) {
+            indicator += "O";
+        } else {
+            indicator += "X";
+        }
         if (object.StockCount >= 0) {
             indicator += "1";
         } else {
@@ -387,7 +394,7 @@ public class Item implements SystemEntities<Item> {
         } else {
             indicator += "0";
         }
-        if (object.Category.length() >= 8 && object.Category.length() <= 48) {
+        if (object.Category.length() >= 3 && object.Category.length() <= 48) {
             indicator += "1";
         } else {
             indicator += "0";
