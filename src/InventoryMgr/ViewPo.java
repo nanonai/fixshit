@@ -269,9 +269,14 @@ public class ViewPo {
         POTable.UpdateTableContent(titles, data);
 
         String temp2 = "<html>Displaying <b>%s</b> to <b>%s</b> of <b>%s</b> records</html>";
-        int start = page * length + 1;
-        int end = Math.min((page + 1) * length, filteredItems.size());
-        lbl_indicate.setText(String.format(temp2, start, end, filteredItems.size()));
+        if (length >= AllPO.size()) {
+            lbl_indicate.setText(String.format(temp2, (!AllPO.isEmpty()) ? 1 : 0, AllPO.size(),
+                    AllPO.size()));
+        } else {
+            lbl_indicate.setText(String.format(temp2, page * length + 1,
+                    Math.min((page + 1) * length, AllPO.size()),
+                    AllPO.size()));
+        }
     }
 
     public static void UpdatePages(int totalItems) {

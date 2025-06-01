@@ -54,17 +54,3 @@ Phone:          0122222222
 Email:          e2eeeee2@d.dee
 Address:        eeeeeeeeeeeeeeeee
 ~~~~~
-SupplierID:     S9998
-SupplierName:   qqqqqqqqqq
-ContactPerson:  qqqqqqqqq
-Phone:          0124565434
-Email:          edsgde@fesgwege.afw
-Address:        123124241241412
-~~~~~
-SupplierID:     S2745
-SupplierName:   dsfdsfdsfsdf
-ContactPerson:  dsfsdfsdfdsf
-Phone:          0123124124
-Email:          dsfdsfdfwef!@sdfds.sdfdsf
-Address:        sdfdsfdfsdfsdf
-~~~~~

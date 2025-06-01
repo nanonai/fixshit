@@ -7,6 +7,7 @@ import SalesMgr.EditSupplier;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.util.List;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -256,6 +257,9 @@ public class ViewItems {
         btnAdd.setPreferredSize(new Dimension(165, 45));  // Increase width and height of the "Add Item" button
         btnAdd.addActionListener(_ -> {
             AddNewItem.ShowPage();
+            AllItems = new Item().ListAll();
+            UpdatePages(AllItems.size());
+            UpdateTable(list_length, page_counter);
         });
         buttonPanel.add(btnAdd, buttonGbc);
 
@@ -301,7 +305,62 @@ public class ViewItems {
                 5, false, null, 0, 0,0);
         btnDelete.setPreferredSize(new Dimension(165, 45));
         btnDelete.addActionListener(_ -> {
-            // Delete Function
+            if (table_item.getSelectedRowCount() == 0) {
+                CustomComponents.CustomOptionPane.showErrorDialog(
+                        parent,
+                        "Please select an item to delete!",
+                        "Error",
+                        new Color(209, 88, 128),
+                        Color.WHITE,
+                        new Color(237, 136, 172),
+                        Color.WHITE
+                );
+            } else {
+                String selected_id = table_item.getValueAt(
+                        table_item.getSelectedRow(),
+                        table_item.getColumnModel().getColumnIndex("ItemID")
+                ).toString();
+                List<PurchaseRequisition> pr_list = new PurchaseRequisition().ListAll();
+                pr_list.removeIf(pr -> !Objects.equals(pr.getItemID(), selected_id));
+                List<PurchaseOrder> po_list = new PurchaseOrder().ListAll();
+                po_list.removeIf(po -> !Objects.equals(po.getItemID(), selected_id));
+                List<Item_Sales> item_salesList = new Item_Sales().ListAllWithFilter(selected_id);
+                if (!pr_list.isEmpty() || !po_list.isEmpty() || !item_salesList.isEmpty()) {
+                    CustomComponents.CustomOptionPane.showErrorDialog(
+                            parent,
+                            "This item have related records!",
+                            "Error",
+                            new Color(209, 88, 128),
+                            Color.WHITE,
+                            new Color(237, 136, 172),
+                            Color.WHITE
+                    );
+                } else {
+                    Item selected_item = new Item().GetObjectByID(selected_id);
+                    boolean delete = CustomComponents.CustomOptionPane.showConfirmDialog(
+                            parent,
+                            String.format("<html>Delete this item?<br>" +
+                                    "User ID:&emsp;&emsp;&emsp;&emsp;&nbsp;<b>%s</b><br>" +
+                                    "Username:&emsp;&emsp;&emsp;<b>%s</b></html>", selected_item.getItemID(), selected_item.getItemName()),
+                            "Confirmation",
+                            new Color(159, 4, 4),
+                            new Color(255, 255, 255),
+                            new Color(161, 40, 40),
+                            new Color(255, 255, 255),
+                            new Color(56, 53, 70),
+                            new Color(255, 255, 255),
+                            new Color(73, 69, 87),
+                            new Color(255, 255, 255),
+                            false
+                    );
+                    if (delete) {
+                        new Item().Remove(selected_item);
+                        AllItems = new Item().ListAll();
+                        UpdatePages(AllItems.size());
+                        UpdateTable(list_length, page_counter);
+                    }
+                }
+            }
         });
         buttonPanel.add(btnDelete, buttonGbc);
 
@@ -313,17 +372,26 @@ public class ViewItems {
                 5, false, null, 0, 0,0);
         btnModify.setPreferredSize(new Dimension(165, 45));
         btnModify.addActionListener(_ -> {
-            try {
-                int selectedRowIndex = table_item.getSelectedRow();
-                Object value = table_item.getValueAt(selectedRowIndex, 0);
-                Item itm = new Item().GetObjectByID(value.toString());
-//                UpdateStock.ShowPage(itm);
-            } catch (Exception e){
-                CustomComponents.CustomOptionPane.showErrorDialog(parent, "Please select something before doing this", "Invalid selection",
+            if (table_item.getSelectedRowCount() == 0) {
+                CustomComponents.CustomOptionPane.showErrorDialog(
+                        parent,
+                        "Please select an item to modify stock!",
+                        "Error",
                         new Color(209, 88, 128),
-                        new Color(255, 255, 255),
+                        Color.WHITE,
                         new Color(237, 136, 172),
-                        new Color(255, 255, 255));
+                        Color.WHITE
+                );
+            } else {
+                String selected_id = table_item.getValueAt(
+                        table_item.getSelectedRow(),
+                        table_item.getColumnModel().getColumnIndex("ItemID")
+                ).toString();
+                Item itm = new Item().GetObjectByID(selected_id);
+                ModifyStock.ShowPage(itm);
+                AllItems = new Item().ListAll();
+                UpdatePages(AllItems.size());
+                UpdateTable(list_length, page_counter);
             }
         });
         buttonPanel.add(btnModify, buttonGbc);
@@ -340,7 +408,7 @@ public class ViewItems {
             int columnIndex = table_item.getColumnModel().getColumnIndex("ItemID");
             Object value = table_item.getValueAt(selectedRowIndex, columnIndex);
             Item itm = new Item().GetObjectByID(value.toString());
-//            StockReport.ShowPage(itm);
+            StockReport.ShowPage(itm);
         });
         buttonPanel.add(btnStockReport, buttonGbc);
         EditItem.Loader(parent, merriweather);
@@ -359,7 +427,11 @@ public class ViewItems {
             data = new Object[length][titles.length];
         }
 
+
         for (Item item : AllItems) {
+            List<Item_Supplier> item_sup = new Item_Supplier().ListAllWithFilter(item.getItemID());
+            Supplier sup = new Supplier().GetObjectByID(item_sup.getFirst().getSupplierID());
+
             if (anti_counter != 0) {
                 anti_counter -= 1;
             } else {
@@ -372,7 +444,7 @@ public class ViewItems {
                         item.getThreshold(),
                         item.getCategory(),
                         item.getLastUpdate(),
-                        "Test"
+                        sup.getSupplierName()
                 };
                 counter += 1;
                 if (counter == length || counter == AllItems.size()) { break; }
@@ -382,9 +454,14 @@ public class ViewItems {
         table_item.UpdateTableContent(titles, data);
 
         String temp2 = "<html>Displaying <b>%s</b> to <b>%s</b> of <b>%s</b> records</html>";
-        int start = page * length + 1;
-        int end = Math.min((page + 1) * length, AllItems.size());
-        lbl_indicate.setText(String.format(temp2, start, end, AllItems.size()));
+        if (length >= AllItems.size()) {
+            lbl_indicate.setText(String.format(temp2, (!AllItems.isEmpty()) ? 1 : 0, AllItems.size(),
+                    AllItems.size()));
+        } else {
+            lbl_indicate.setText(String.format(temp2, page * length + 1,
+                    Math.min((page + 1) * length, AllItems.size()),
+                    AllItems.size()));
+        }
     }
 
 

@@ -3,6 +3,7 @@ package InventoryMgr;
 import Admin.*;
 import Classes.CustomComponents;
 import Classes.User;
+import SalesMgr.AddNewItem;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -47,7 +48,6 @@ public class InventoryHome {
         InventoryHome.top_bar = top_bar;
         InventoryHome.content = content;
         InventoryHome.current_user = current_user;
-//        InvStatic.Initialize(parent, content, current_user);
     }
 
     public static void ShowPage() {
@@ -217,6 +217,9 @@ public class InventoryHome {
         Profile.Loader(merriweather, boldonse, content, current_user);
         ViewItems.Loader(parent, merriweather, boldonse, content, current_user);
         ViewPo.Loader(parent, merriweather, boldonse, content, current_user);
+        AddNewItem.Loader(parent, merriweather);
+        ModifyStock.Loader(parent, merriweather, boldonse, content, current_user);
+        StockReport.Loader(parent, merriweather, boldonse, content, current_user);
         PageChanger();
 
         SwingUtilities.invokeLater(() -> StockAlert.Popup(parent));
